@@ -59,10 +59,6 @@ For small datasets, just click **Insert row** in the Table Editor and type value
 
 1. In Supabase → **Authentication** → **Users** → **Add user**
 2. Create one account per person:
-   - Your email + password
-   - Wife's email + password
-   - Friend's email + password
-   - Friend's wife's email + password
 3. Each person logs in with their own email/password
 4. **Disable "Confirm email"** in Auth → Settings → Email Auth → uncheck "Enable email confirmations" (so they can log in straight away without email verification)
 
