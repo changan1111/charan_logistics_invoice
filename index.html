@@ -336,12 +336,70 @@ tbody tr:hover td{background:var(--ice);cursor:pointer;}
 .stat-perf-lbl{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--sky);margin-bottom:.2rem;font-weight:600;}
 .stat-perf-sub{font-size:.72rem;color:var(--muted);}
 
-@media print{
-  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
-  body>*:not(.overlay){display:none!important;}
-  .overlay{display:block!important;position:static!important;background:none!important;}
-  .modal{max-height:none!important;box-shadow:none!important;animation:none!important;border-radius:0!important;width:100%!important;max-width:100%!important;}
-  .modal-bar,.modal-bar-acts{display:none!important;}
+@media print {
+  /* Force A4 page size and remove margins */
+  @page {
+    size: A4 portrait;
+    margin: 0mm;
+  }
+
+  /* Color accuracy */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide everything except the invoice overlay */
+  body > *:not(.overlay) {
+    display: none !important;
+  }
+
+  .overlay {
+    display: block !important;
+    position: static !important;
+    background: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+
+  .modal {
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    animation: none !important;
+    border-radius: 0 !important;
+    width: 210mm !important;
+    max-width: 210mm !important;
+    min-height: 297mm !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    position: relative !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Hide UI controls */
+  .modal-bar,
+  .modal-bar-acts {
+    display: none !important;
+  }
+
+  /* Prevent content from being clipped */
+  html, body {
+    width: 210mm !important;
+    height: auto !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Ensure the invoice iframe/canvas fills properly */
+  canvas, iframe {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
 }
 
 @media(max-width:680px){
@@ -1119,18 +1177,45 @@ function dlPDF(){
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'Invoice-'+curInv.number+'.pdf';
+// Extract the running number (part after the last /)
+  const runNum = (curInv.number || '').split('/').pop() || '0000';
+  
+  // Clean the client name for use in filename (remove special chars)
+  const clientName = (curInv.name || 'Client')
+    .replace(/[^a-zA-Z0-9\s]/g, '')   // remove special chars
+    .replace(/\s+/g, '_')              // spaces to underscores
+    .trim().replace(" ","_");
+
+  // Format billing date (remove slashes/dashes for filename safety)
+  const billingDate = (curInv.billingDate || '')
+    .replace(/[\/\-]/g, '-')
+    .trim();
+
+  a.download = `${runNum}_${clientName}_Invoice_${billingDate}.pdf`;
   a.click();
   URL.revokeObjectURL(url);
 }
 function shareInv(){
   if(!curInv) return;
   const blob = makePDF(curInv);
-  const file = new File([blob], 'Invoice-'+curInv.number+'.pdf', {type: 'application/pdf'});
+
+  // Build consistent filename
+  const runNum = (curInv.number || '').split('/').pop() || '0000';
+  const clientName = (curInv.name || 'Client')
+    .replace(/[^a-zA-Z0-9\s]/g, '')
+    .replace(/\s+/g, '_')
+    .trim();
+  const billingDate = (curInv.billingDate || '')
+    .replace(/[\/\-]/g, '-')
+    .trim();
+  const fileName = `${runNum}_${clientName}_Invoice_${billingDate}.pdf`;
+
+  const file = new File([blob], fileName, {type: 'application/pdf'});
+
   if(navigator.share && navigator.canShare && navigator.canShare({files: [file]})){
     navigator.share({
       files: [file],
-      title: 'Invoice '+curInv.number,
+      title: fileName.replace('.pdf', ''),   // title also uses same format
       text: 'Please find the attached invoice.'
     }).catch(err => console.log('Share failed:', err));
   } else {
@@ -1148,11 +1233,26 @@ function quickPDF(num){
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'Invoice-'+inv.number+'.pdf';
+// Extract the running number (part after the last /)
+  const runNum = (curInv.number || '').split('/').pop() || '0000';
+  
+  // Clean the client name for use in filename (remove special chars)
+  const clientName = (curInv.name || 'Client')
+    .replace(/[^a-zA-Z0-9\s]/g, '')   // remove special chars
+    .replace(/\s+/g, '_')              // spaces to underscores
+    .trim().replace(" ","_");
+
+  // Format billing date (remove slashes/dashes for filename safety)
+  const billingDate = (curInv.billingDate || '')
+    .replace(/[\/\-]/g, '-')
+    .trim();
+
+  a.download = `${runNum}_${clientName}_Invoice_${billingDate}.pdf`;
     a.click();
     URL.revokeObjectURL(url);
   }
 }
+
 
 function makePDF(inv){
   const {jsPDF} = window.jspdf;
