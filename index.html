@@ -1234,10 +1234,10 @@ function quickPDF(num){
     const a = document.createElement('a');
     a.href = url;
 // Extract the running number (part after the last /)
-  const runNum = (curInv.number || '').split('/').pop() || '0000';
+  const runNum = (inv.number || '').split('/').pop() || '0000';
   
   // Clean the client name for use in filename (remove special chars)
-  const clientName = (curInv.name || 'Client')
+  const clientName = (inv.name || 'Client')
     .replace(/[^a-zA-Z0-9\s]/g, '')   // remove special chars
     .replace(/\s+/g, '_')              // spaces to underscores
     .trim().replace(" ","_");
@@ -1257,7 +1257,7 @@ function quickPDF(num){
 function makePDF(inv){
   const {jsPDF} = window.jspdf;
   const doc = new jsPDF({orientation:'p', unit:'mm', format:'a4'});
-  const W=210, M=20;
+  const W=210, M=7;
   const cur = 'S$';
 
   const HEADER_IMG_URL = './header.png';
@@ -1392,14 +1392,31 @@ function makePDF(inv){
   drawHeaderFooter();
 
   // ── INVOICE META ──
-  const metaY = CONTENT_TOP + 4;
+
+
+    const centerX = W / 2;
+  let metaY = CONTENT_TOP + 6;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(16);
+  doc.setTextColor(59, 130, 196);
+  doc.text('INVOICE', centerX, metaY, { align: 'center' });
+
+  const invTextW = doc.getTextWidth('INVOICE');
+  doc.setDrawColor(59, 130, 196);
+  doc.setLineWidth(0.5);
+  doc.line(centerX - invTextW / 2, metaY + 2, centerX + invTextW / 2, metaY + 2);
+
+  metaY += 12;
+
+
   doc.setFont('helvetica','bold');
   doc.setFontSize(15);
   const numStr = '#'+inv.number;
   const numW = doc.getTextWidth(numStr);
   const labelW = doc.getTextWidth('INVOICE ');
   doc.setTextColor(130,150,180);
-  doc.text('INVOICE', W-M - numW - labelW, metaY);
+  doc.text('Invoice No.', W-M - numW - labelW-6, metaY);
   doc.setTextColor(11,29,58);
   doc.text(numStr, W-M, metaY, {align:'right'});
 
@@ -1407,15 +1424,17 @@ function makePDF(inv){
   doc.setFontSize(14);
   doc.setTextColor(11,29,58);
   // ► "Billing Date:" label in PDF
-  if(inv.billingDate) doc.text('Billing Date: '+inv.billingDate, W-M, metaY+8, {align:'right'});
+  if(inv.billingDate) doc.text('Billing Date: '+inv.billingDate, W-M-6, metaY+8, {align:'right'});
   if(inv.due)         doc.text('Due: '+inv.due, W-M, metaY+14, {align:'right'});
 
   // ── BILLED TO / FROM ──
-  const partyY = CONTENT_TOP + 4;
+  //const partyY = CONTENT_TOP + 6;
+  const partyY = metaY;
+
   doc.setFont('helvetica','bold');
   doc.setFontSize(12);
   doc.setTextColor(59,130,196);
-  doc.text('BILLED TO', M, partyY);
+  doc.text('BILLED TO', M, metaY);
   doc.setFont('helvetica','bold');
   doc.setFontSize(12);
   doc.setTextColor(11,29,58);
@@ -1457,14 +1476,14 @@ function makePDF(inv){
         0:{cellWidth:28, halign:'left'},  // Date
         1:{cellWidth:'auto'},              // Description
         2:{halign:'center', cellWidth:18}, // Qty
-        3:{halign:'right',  cellWidth:36}, // Rate
-        4:{halign:'right',  cellWidth:36, fontStyle:'bold'}, // Amount
+        3:{halign:'right',  cellWidth:32}, // Rate
+        4:{halign:'right',  cellWidth:32, fontStyle:'bold'}, // Amount
       }
     : {
         0:{cellWidth:'auto'},
         1:{halign:'center', cellWidth:18},
-        2:{halign:'right',  cellWidth:36},
-        3:{halign:'right',  cellWidth:36, fontStyle:'bold'},
+        2:{halign:'right',  cellWidth:32},
+        3:{halign:'right',  cellWidth:32, fontStyle:'bold'},
       };
 
   const rowsPerPage = 200;
