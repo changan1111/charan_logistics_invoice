@@ -1234,16 +1234,16 @@ function quickPDF(num){
     const a = document.createElement('a');
     a.href = url;
 // Extract the running number (part after the last /)
-  const runNum = (curInv.number || '').split('/').pop() || '0000';
+  const runNum = (inv.number || '').split('/').pop() || '0000';
   
   // Clean the client name for use in filename (remove special chars)
-  const clientName = (curInv.name || 'Client')
+  const clientName = (inv.name || 'Client')
     .replace(/[^a-zA-Z0-9\s]/g, '')   // remove special chars
     .replace(/\s+/g, '_')              // spaces to underscores
     .trim().replace(" ","_");
 
   // Format billing date (remove slashes/dashes for filename safety)
-  const billingDate = (curInv.billingDate || '')
+  const billingDate = (inv.billingDate || '')
     .replace(/[\/\-]/g, '-')
     .trim();
 
