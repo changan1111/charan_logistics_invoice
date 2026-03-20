@@ -1480,6 +1480,7 @@ function makePDF(inv){
       head: tableHead,
       body: pageRows,
       margin: {left:M, right:M, top: CONTENT_TOP, bottom: FOOTER_H+6},
+      rowPageBreak: 'avoid',
       headStyles:{
         fillColor:[11,29,58],
         textColor:[175,205,240],
