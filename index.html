@@ -825,7 +825,7 @@ async function loadData(){
   try {
     // Fetch clients and line_items in parallel
     const [{ data: clients, error: e1 }, { data: lineItems, error: e2 }] = await Promise.all([
-      sb.from('clients').select('*'),
+      sb.from('clients').select('*').order('invoice_number', { ascending: false }),
       sb.from('line_items').select('*')
     ]);
 
