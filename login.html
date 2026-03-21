@@ -225,8 +225,8 @@ async function draw(){
 draw();
 
 // Already logged in → skip to dashboard
-sb.auth.getSession().then(({ data: { session } }) => {
-  if (session) window.location.replace('./index.html');
+sb.auth.getUser().then(({ data: { user } }) => {
+  if (user) window.location.replace('./index.html');
 });
 
 function toggleEye() {
