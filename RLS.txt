@@ -1,0 +1,24 @@
+ALTER TABLE clients ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "auth_all" ON clients;
+CREATE POLICY "auth_all" ON clients
+  FOR ALL TO authenticated
+  USING (true) WITH CHECK (true);
+
+
+
+ALTER TABLE line_items ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "auth_all" ON line_items;
+CREATE POLICY "auth_all" ON line_items
+  FOR ALL TO authenticated
+  USING (true) WITH CHECK (true);
+
+
+
+
+To verify your existing policies, run this in the SQL editor:
+
+SELECT tablename, policyname, cmd, roles
+FROM pg_policies
+WHERE tablename IN ('clients', 'line_items', 'salary_records');
