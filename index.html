@@ -1811,27 +1811,111 @@ async function prGenPDFFromRecord(r) {
   doc.text('TOTAL DEDUCTIONS',14+cw+4,y+86);doc.setTextColor(139,58,46);doc.text(ded.toFixed(2),14+cw+cw-5,y+86,{align:'right'});
 
   // Net salary box
-  y+=82;
-  doc.setFillColor(26,26,46);doc.roundedRect(14,y,182,26,3,3,'F');
-  doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(200,190,160);
-  doc.text('NET SALARY PAYABLE',20,y+7);
-  doc.setFontSize(17);doc.setTextColor(201,168,76);
-  doc.text(prMf(net),190,y+17,{align:'right'});
+ // --- 3 Boxes instead of 1 ---
+y += 92;
+
+const boxW = 58;   // reduced width (182 / 3 ≈ 60 → keep margin safe)
+const gap = 3;
+
+// --- 1. Earnings ---
+doc.setFillColor(240,235,220);
+doc.roundedRect(14, y, boxW, 26, 3, 3, 'F');
+
+doc.setFont('helvetica','bold');
+doc.setFontSize(8.5);
+doc.setTextColor(26,26,46);
+doc.text('TOTAL EARNINGS', 18, y+7);
+
+doc.setFontSize(12);
+doc.setTextColor(74,103,65);
+doc.text(prMf(earn), 14 + boxW - 4, y+17, { align:'right' });
+
+
+// --- 2. Deductions ---
+const x2 = 14 + boxW + gap;
+
+doc.setFillColor(240,235,220);
+doc.roundedRect(x2, y, boxW, 26, 3, 3, 'F');
+
+doc.setFontSize(8.5);
+doc.setTextColor(26,26,46);
+doc.text('TOTAL DEDUCTIONS', x2 + 4, y+7);
+
+doc.setFontSize(12);
+doc.setTextColor(139,58,46);
+doc.text(prMf(ded), x2 + boxW - 4, y+17, { align:'right' });
+
+
+// --- 3. Net Salary (highlight) ---
+const x3 = x2 + boxW + gap;
+
+doc.setFillColor(26,26,46);
+doc.roundedRect(x3, y, boxW, 26, 3, 3, 'F');
+
+doc.setFontSize(8.5);
+doc.setTextColor(200,190,160);
+doc.text('NET SALARY', x3 + 4, y+7);
+
+doc.setFontSize(14);
+doc.setTextColor(201,168,76);
+doc.text(prMf(net), x3 + boxW - 4, y+17, { align:'right' });
 
   y+=32;
   doc.setFillColor(255,255,255);doc.setDrawColor(212,201,168);doc.roundedRect(14,y,182,16,3,3,'FD');
   doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(120,110,88);doc.text('AMOUNT IN WORDS:',18,y+5.5);
   doc.setFont('helvetica','italic');doc.setFontSize(8.5);doc.setTextColor(26,26,46);doc.text(words(net),18,y+13);
 
+
+  // --- Approval / Receipt Section ---
+y += 24;
+
+doc.setFont('helvetica','bold');
+doc.setFontSize(8);
+doc.setTextColor(120,110,88);
+
+// LEFT → Approved By
+doc.text('APPROVED BY', 20, y);
+
+// RIGHT → Received By
+doc.text('RECEIVED BY', 190, y, { align: 'right' });
+
+// Signature lines
+doc.setDrawColor(180);
+doc.setLineWidth(0.3);
+
+// Line under Approved By (left)
+doc.line(20, y+10, 80, y+10);
+
+// Line under Received By (right)
+doc.line(130, y+10, 190, y+10);
+
+
+// --- Seal & Signature (Right side below Received By) ---
+y += 18;
+
+doc.setFont('helvetica','bold');
+doc.setFontSize(8);
+doc.setTextColor(120,110,88);
+
+// Right aligned block
+doc.text('FOR CHARAN LOGISTICS', 190, y, { align: 'right' });
+
+// Signature line
+doc.line(130, y+10, 190, y+10);
+
+// Caption
+doc.setFontSize(7);
+doc.text('Authorised Signatory & Seal', 190, y+14, { align: 'right' });
   // QR Code - show in top right of footer area
-  if(prQrImg){
+  /*if(prQrImg){
     const qsz=28;
     const qx=210-8-qsz;
     const qy=297-FOOTER_H_PR+3;
     doc.addImage(prQrImg.d,prQrImg.ext,qx,qy,qsz,qsz,'','NONE');
     doc.setFont('helvetica','normal');doc.setFontSize(6);doc.setTextColor(200,190,160);
     doc.text('Scan to Pay',qx+qsz/2,qy+qsz+3.5,{align:'center'});
-  }
+  }*/
+
 
   doc.save(`SalarySlip_${(r.name||'').replace(/\s+/g,'_')}_${ml.replace(/\s/g,'_')}.pdf`);
 }
