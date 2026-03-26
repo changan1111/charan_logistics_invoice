@@ -1779,7 +1779,7 @@ async function prGenPDFFromRecord(r) {
   doc.roundedRect(14,y,182,34,3,3,'FD');
   doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(120,110,88);
   doc.text('EMPLOYEE NAME',15,y+8);doc.text('NRIC NO.',15,y+17);doc.text('DESIGNATION',15,y+26);
-  doc.text('PAYMENT DATE',138,y+8);doc.text('SALARY MONTH',138,y+17);doc.text('REFERENCE NO.',138,y+26);
+  doc.text('PAYMENT DATE',130,y+8);doc.text('SALARY MONTH',130,y+17);doc.text('REFERENCE NO.',130,y+26);
   doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(26,26,46);
   doc.text(r.name||'—',50,y+8);doc.text(r.nric||'—',50,y+17);doc.text(r.desig||'—',50,y+26);
   doc.text(r.paydate||'—',165,y+8);doc.text(ml,165,y+17);doc.text(r.ref||'—',165,y+26);
