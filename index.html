@@ -646,7 +646,7 @@ tbody tr:hover td{background:var(--ice);cursor:pointer;}
         <div class="pr-card-title">Employee Details</div>
         <div class="pr-form-grid">
           <div class="pr-field"><label>Employee Name</label><input type="text" id="ps_name" placeholder="Full Name"/></div>
-          <div class="pr-field"><label>NRIC No.</label><input type="text" id="ps_nric" placeholder="e.g. S1234567A"/></div>
+          <div class="pr-field"><label>NRIC/FIN No.</label><input type="text" id="ps_nric" placeholder="e.g. S1234567A"/></div>
           <div class="pr-field"><label>Designation</label><input type="text" id="ps_desig" placeholder="e.g. Driver"/></div>
           <div class="pr-field"><label>Salary Month</label><input type="month" id="ps_month"/></div>
           <div class="pr-field"><label>Payment Date</label><input type="date" id="ps_paydate"/></div>
@@ -1778,7 +1778,7 @@ async function prGenPDFFromRecord(r) {
   doc.setFillColor(255,255,255);doc.setDrawColor(212,201,168);doc.setLineWidth(.4);
   doc.roundedRect(14,y,182,34,3,3,'FD');
   doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(120,110,88);
-  doc.text('EMPLOYEE NAME',15,y+8);doc.text('NRIC NO.',15,y+17);doc.text('DESIGNATION',15,y+26);
+  doc.text('EMPLOYEE NAME',15,y+8);doc.text('NRIC/FIN NO.',15,y+17);doc.text('DESIGNATION',15,y+26);
   doc.text('PAYMENT DATE',130,y+8);doc.text('SALARY MONTH',130,y+17);doc.text('REFERENCE NO.',130,y+26);
   doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(26,26,46);
   doc.text(r.name||'—',50,y+8);doc.text(r.nric||'—',50,y+17);doc.text(r.desig||'—',50,y+26);
