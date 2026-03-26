@@ -1778,11 +1778,11 @@ async function prGenPDFFromRecord(r) {
   doc.setFillColor(255,255,255);doc.setDrawColor(212,201,168);doc.setLineWidth(.4);
   doc.roundedRect(14,y,182,34,3,3,'FD');
   doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(120,110,88);
-  doc.text('EMPLOYEE NAME',20,y+8);doc.text('NRIC NO.',20,y+17);doc.text('DESIGNATION',20,y+26);
-  doc.text('PAYMENT DATE',108,y+8);doc.text('SALARY MONTH',108,y+17);doc.text('REFERENCE NO.',108,y+26);
+  doc.text('EMPLOYEE NAME',15,y+8);doc.text('NRIC NO.',15,y+17);doc.text('DESIGNATION',15,y+26);
+  doc.text('PAYMENT DATE',150,y+8);doc.text('SALARY MONTH',150,y+17);doc.text('REFERENCE NO.',150,y+26);
   doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(26,26,46);
-  doc.text(r.name||'—',62,y+8);doc.text(r.nric||'—',62,y+17);doc.text(r.desig||'—',62,y+26);
-  doc.text(r.paydate||'—',152,y+8);doc.text(ml,152,y+17);doc.text(r.ref||'—',152,y+26);
+  doc.text(r.name||'—',50,y+8);doc.text(r.nric||'—',50,y+17);doc.text(r.desig||'—',50,y+26);
+  doc.text(r.paydate||'—',165,y+8);doc.text(ml,165,y+17);doc.text(r.ref||'—',165,y+26);
 
   // Earnings / Deductions table
   y+=40; const cw=91;
