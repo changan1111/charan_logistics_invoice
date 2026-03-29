@@ -319,6 +319,11 @@ tbody tr:hover td{background:var(--ice);cursor:pointer;}
 .pr-sdot.spin-dot{background:var(--gold);animation:pulse-dot 1s infinite;}
 .pr-sdot.err{background:#e53935;}
 .pr-sdot.warn{background:#ff9800;}
+
+ #ai_tbody input[type="number"]::placeholder {
+  color: #cccccc;
+  opacity: 1;
+}
 @keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.4}}
 
 /* ══════════════════════════════════════════════════════════
@@ -550,6 +555,9 @@ tbody tr:hover td{background:var(--ice);cursor:pointer;}
     <span class="sb-ico">💬</span> WhatsApp
   </button>
   
+  <button class="sb-btn" id="sb-addinvoice" onclick="showPanel('addinvoice',this)">
+    <span class="sb-ico">➕</span> Add Invoice
+  </button>
   <div class="sb-divider" style="margin-top:auto"></div>
   <button class="sb-signout" onclick="signOut()">🚪 Sign Out</button>
 </nav>
@@ -851,6 +859,131 @@ tbody tr:hover td{background:var(--ice);cursor:pointer;}
   </div>
 </div>
 
+<!-- ══════════ ADD INVOICE PANEL ══════════ -->
+<div id="panel-addinvoice" class="panel">
+  <div class="page">
+
+    <!-- Success / Error banner -->
+    <div id="ai-success" style="display:none;background:#e4f7ee;border:1.5px solid #0a7a4b;border-radius:10px;padding:14px 18px;margin-bottom:16px;font-size:.88rem;color:#0a7a4b;font-weight:600;">
+      ✅ <span id="ai-success-msg"></span>
+    </div>
+    <div id="ai-error" style="display:none;background:#fdeaea;border:1.5px solid #c0282e;border-radius:10px;padding:14px 18px;margin-bottom:16px;font-size:.88rem;color:#c0282e;font-weight:600;">
+      ❌ <span id="ai-error-msg"></span>
+    </div>
+
+    <!-- Client / Invoice Header -->
+    <div class="pr-card">
+      <div class="pr-card-title">Invoice Details</div>
+      <div class="pr-form-grid">
+        <div class="pr-field">
+  <label>Invoice Number <span style="color:#c0282e">*</span></label>
+  <div style="display:flex; gap:8px; align-items:center;">
+    <input type="text" id="ai_invnum" placeholder="e.g. 2026/00001"
+           oninput="aiClearErr('ai_invnum')"
+           style="flex:1; min-width:0;"/>
+    <button type="button" onclick="fetchAutoInvoiceNumber()"
+            style="white-space:nowrap; padding:6px 12px; background:#2b6cb0;
+                   color:white; border:none; border-radius:6px; cursor:pointer;
+                   font-size:13px; flex-shrink:0;">
+      Auto Number
+    </button>
+  </div>
+</div>
+
+<div class="pr-field">
+  <label>Billing Date <span style="color:#c0282e">*</span></label>
+  <input type="date" id="ai_billingdate" oninput="aiClearErr('ai_billingdate')"/>
+</div>
+        <!--div class="pr-field">
+          <label>Billing Date <span style="color:#c0282e">*</span></label>
+          <input type="date" id="ai_billingdate" oninput="aiClearErr('ai_billingdate')"/>
+        </div-->
+        <div class="pr-field">
+          <label>Status <span style="color:#c0282e">*</span></label>
+          <select id="ai_status" oninput="aiClearErr('ai_status')">
+            <option value="">— Select —</option>
+            <option value="pending">Pending</option>
+            <option value="paid">Paid</option>
+            <option value="overdue">Overdue</option>
+          </select>
+        </div>
+        <div class="pr-field span2">
+          <label>Client Name <span style="color:#c0282e">*</span></label>
+       <div style="display:flex; gap:8px; align-items:center;">
+  <input 
+    type="text" 
+    id="ai_name" 
+    placeholder="e.g. ABC Pte Ltd"
+    oninput="aiClearErr('ai_name')" 
+    style="flex:1;"
+  />
+
+  <button 
+    type="button" 
+    onclick="fetchClientAddress()" 
+    style="
+      white-space: nowrap;
+      padding: 6px 12px;
+      background:#2b6cb0;
+      color:white;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:13px;
+    ">
+    Fetch
+  </button>
+  </div>
+        </div>
+        <div class="pr-field span2">
+          <label>Client Address</label>
+          <input type="text" id="ai_address" placeholder="e.g. 10 Anson Road, Singapore 079903"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Line Items -->
+    <div class="pr-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="pr-card-title" style="margin-bottom:0;padding-bottom:0;border-bottom:none;">Line Items</div>
+        <button class="qt-add-row-btn" style="margin-top:0" onclick="aiAddRow()">+ Add Row</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="qt-items-table" style="min-width:580px">
+          <thead><tr>
+            <th style="width:36px">#</th>
+            <th>Date</th>
+            <th>Description <span style="color:#f0d080">*</span></th>
+            <th style="width:70px;text-align:center">Qty <span style="color:#f0d080">*</span></th>
+            <th style="width:120px;text-align:right">Rate (S$) <span style="color:#f0d080">*</span></th>
+            <th style="width:120px;text-align:right">Amount (S$)</th>
+            <th style="width:36px"></th>
+          </tr></thead>
+          <tbody id="ai_tbody"></tbody>
+        </table>
+      </div>
+      <!-- Totals -->
+      <div style="display:flex;justify-content:flex-end;margin-top:12px;gap:24px;align-items:center;flex-wrap:wrap;">
+        <div style="text-align:right">
+          <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:#7a6e58">Total Amount</div>
+          <div style="font-size:1.6rem;font-weight:700;font-family:'Outfit',serif;color:var(--gold)" id="ai_total">S$ 0.00</div>
+        </div>
+      </div>
+      <div style="margin-top:8px;font-size:.75rem;color:var(--muted)">
+        💡 Total is auto-calculated from line items. At least one line item with Description, Qty and Rate is required.
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="pr-actions">
+      <button class="btn btn-outline" onclick="aiReset()">✕ Clear All</button>
+      <button class="btn btn-primary" id="ai-submit-btn" onclick="aiSubmit()">
+        ☁ Save Invoice to Database
+      </button>
+    </div>
+
+  </div>
+</div>
 </div><!-- /content-area -->
 </div><!-- /app-body -->
 
@@ -908,6 +1041,7 @@ tbody tr:hover td{background:var(--ice);cursor:pointer;}
 const SUPABASE_URL      = "%%SUPABASE_URL%%";
 const SUPABASE_ANON_KEY = "%%SUPABASE_ANON_KEY%%";
 
+
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -943,6 +1077,9 @@ function showPanel(name, btn) {
   if (name === 'payroll') {
     prUpdateUI();
     prFetch();
+  }
+    if (name === 'addinvoice') {
+    aiInit();
   }
 }
 function toggleSidebar() {
@@ -2113,6 +2250,298 @@ function prFmtMonth(raw){
   if(isNaN(d)) return '—';
   return d.toLocaleString('default',{month:'long',year:'numeric',timeZone:'UTC'});
 }
+
+// ══════════════════════════════════════════════════════════════
+//  ADD INVOICE — post to clients + line_items tables
+// ══════════════════════════════════════════════════════════════
+let aiRowId = 0;
+
+function aiInit() {
+  // Default billing date = today
+  ge('ai_billingdate').value = today_str();
+  // Add 3 blank rows to start
+  if(ge('ai_tbody').children.length === 0){
+    aiAddRow(); aiAddRow(); aiAddRow();
+  }
+}
+
+function aiAddRow(date='', desc='', qty='', rate='') {
+  aiRowId++;
+  const n = aiRowId;
+  const idx = ge('ai_tbody').children.length + 1;
+  const tr = document.createElement('tr');
+  tr.id = 'airow' + n;
+  tr.innerHTML = `
+    <td style="text-align:center;color:#7a6e58;font-weight:600;font-size:.82rem">${idx}</td>
+    <td><input type="date" value="${date}" oninput="aiCalcTotal()" style="min-width:130px"/></td>
+    <td><input type="text" placeholder="Description" value="${desc}" oninput="aiClearRowErr(${n});aiCalcTotal()"/></td>
+    <td><input type="number" placeholder="1" value="${qty}" min="0.01" step="0.01" oninput="aiClearRowErr(${n});aiCalcTotal()" style="text-align:center"/></td>
+    <td><input type="number" placeholder="0.00" value="${rate}" min="0" step="0.01" oninput="aiClearRowErr(${n});aiCalcTotal()" style="text-align:right"/></td>
+    <td style="text-align:right;font-weight:600;font-size:.85rem;color:var(--ink)" id="aiamt${n}">S$ 0.00</td>
+    <td><button class="qt-del-btn" onclick="aiDelRow(${n})" title="Remove row">✕</button></td>`;
+  ge('ai_tbody').appendChild(tr);
+  aiCalcTotal();
+}
+
+function aiDelRow(n) {
+  ge('airow' + n)?.remove();
+  // renumber
+  [...ge('ai_tbody').children].forEach((r, i) => r.cells[0].textContent = i + 1);
+  aiCalcTotal();
+}
+
+function aiCalcTotal() {
+  let total = 0;
+  [...ge('ai_tbody').querySelectorAll('tr')].forEach(r => {
+    const qty  = parseFloat(r.cells[3].querySelector('input').value) || 0;
+    const rate = parseFloat(r.cells[4].querySelector('input').value) || 0;
+    const amt  = qty * rate;
+    total += amt;
+    const id = r.id.replace('airow','');
+    const el = ge('aiamt' + id);
+    if(el) el.textContent = 'S$ ' + amt.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  });
+  ge('ai_total').textContent = 'S$ ' + total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  return total;
+}
+
+function aiClearErr(id) {
+  ge(id)?.classList.remove('error');
+}
+function aiClearRowErr(n) {
+  const row = ge('airow' + n);
+  if(row) row.querySelectorAll('input').forEach(i => i.classList.remove('error'));
+}
+
+function aiReset() {
+  ['ai_invnum','ai_billingdate','ai_duedate','ai_name','ai_address'].forEach(id => {
+    const el = ge(id);
+    if(el){ el.value = ''; el.classList.remove('error'); }
+  });
+  ge('ai_status').value = '';
+  ge('ai_status').classList.remove('error');
+  ge('ai_tbody').innerHTML = '';
+  aiRowId = 0;
+  ge('ai_total').textContent = 'S$ 0.00';
+  ge('ai-success').style.display = 'none';
+  ge('ai-error').style.display   = 'none';
+  ge('ai_billingdate').value = today_str();
+  aiAddRow(); aiAddRow(); aiAddRow();
+}
+
+async function aiSubmit() {
+  // ── Hide banners ──
+  ge('ai-success').style.display = 'none';
+  ge('ai-error').style.display   = 'none';
+
+  // ── Validate header fields ──
+  let valid = true;
+  const req = [
+    { id:'ai_invnum',     label:'Invoice Number' },
+    { id:'ai_billingdate',label:'Billing Date'   },
+    { id:'ai_status',     label:'Status'         },
+    { id:'ai_name',       label:'Client Name'    },
+  ];
+  req.forEach(({id}) => {
+    const el = ge(id);
+    if (!el.value.trim()) { el.classList.add('error'); valid = false; }
+  });
+  if (!valid) {
+    ge('ai-error').style.display = 'block';
+    ge('ai-error-msg').textContent = 'Please fill all required fields marked with *.';
+    ge('ai-error').scrollIntoView({ behavior:'smooth', block:'nearest' });
+    return;
+  }
+
+  // ── Convert billing date: YYYY-MM-DD (date input) → DD-MM-YYYY (text storage) ──
+  const billingDateRaw = ge('ai_billingdate').value;
+  const [by, bm, bd]  = billingDateRaw.split('-');
+  const billingDate   = `${bd}-${bm}-${by}`;
+
+  // ── Validate line items ──
+  const rows = [...ge('ai_tbody').querySelectorAll('tr')];
+  const lineItems = [];
+  let liValid = true, hasAtLeastOne = false;
+
+  rows.forEach(r => {
+    const desc      = r.cells[2].querySelector('input').value.trim();
+    const qty       = parseFloat(r.cells[3].querySelector('input').value);
+    const rate      = parseFloat(r.cells[4].querySelector('input').value);
+    const dateInput = r.cells[1].querySelector('input');
+
+    // Skip fully blank rows
+    if (!desc && !qty && !rate) return;
+
+    hasAtLeastOne = true;
+    let rowOk = true;
+
+    if (!desc)               { r.cells[2].querySelector('input').classList.add('error'); liValid=false; rowOk=false; }
+    if (!qty || qty <= 0)    { r.cells[3].querySelector('input').classList.add('error'); liValid=false; rowOk=false; }
+    if (isNaN(rate)||rate<0) { r.cells[4].querySelector('input').classList.add('error'); liValid=false; rowOk=false; }
+
+    // Convert line-item date: YYYY-MM-DD → DD-MM-YYYY (null if blank)
+    let dateVal = null;
+    if (dateInput.value) {
+      const [y, m, d] = dateInput.value.split('-');
+      dateVal = `${d}-${m}-${y}`;
+    }
+
+    if (rowOk) {
+      lineItems.push({
+        invoice_number: ge('ai_invnum').value.trim(),
+        description:    desc,
+        qty:            qty,
+        unit_price:     rate,
+        date:           dateVal,
+      });
+    }
+  });
+
+  if (!hasAtLeastOne) {
+    ge('ai-error').style.display = 'block';
+    ge('ai-error-msg').textContent = 'Please add at least one line item with Description, Qty and Rate.';
+    return;
+  }
+  if (!liValid) {
+    ge('ai-error').style.display = 'block';
+    ge('ai-error-msg').textContent = 'Some line items have missing or invalid fields. Please fix them.';
+    ge('ai-error').scrollIntoView({ behavior:'smooth', block:'nearest' });
+    return;
+  }
+
+  // ── Calculate total ──
+  const total = lineItems.reduce((s, li) => s + (li.qty * li.unit_price), 0);
+
+  // ── Build client record ──
+  const clientRecord = {
+    invoice_number: ge('ai_invnum').value.trim(),
+    name:           ge('ai_name').value.trim(),
+    address:        ge('ai_address').value.trim() || null,
+    billing_date:   billingDate,
+    status:         ge('ai_status').value,
+    total:          total,
+  };
+
+  // ── Disable button / show loading ──
+  const btn  = ge('ai-submit-btn');
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-sm"></span> Saving…';
+
+  try {
+    // 1. Upsert into clients
+    const { error: e1 } = await sb
+      .from('clients')
+      .upsert(clientRecord, { onConflict: 'invoice_number' });
+    if (e1) throw new Error('clients table: ' + e1.message);
+
+    // 2. Delete existing line items for this invoice
+    const { error: e2 } = await sb
+      .from('line_items')
+      .delete()
+      .eq('invoice_number', clientRecord.invoice_number);
+    if (e2) throw new Error('clearing line_items: ' + e2.message);
+
+    // 3. Insert new line items
+    const { error: e3 } = await sb
+      .from('line_items')
+      .insert(lineItems);
+    if (e3) throw new Error('line_items table: ' + e3.message);
+
+    // ── Success ──
+    ge('ai-success').style.display = 'block';
+    ge('ai-success-msg').textContent =
+      `Invoice ${clientRecord.invoice_number} saved! ` +
+      `${lineItems.length} line item${lineItems.length !== 1 ? 's' : ''} · ` +
+      `Total: S$ ${total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+    ge('ai-success').scrollIntoView({ behavior:'smooth', block:'nearest' });
+
+    setTimeout(() => loadData(), 1000);
+
+  } catch(err) {
+    ge('ai-error').style.display = 'block';
+    ge('ai-error-msg').textContent = 'Save failed: ' + err.message;
+    ge('ai-error').scrollIntoView({ behavior:'smooth', block:'nearest' });
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = orig;
+  }
+}
+
+async function fetchClientAddress() {
+  const clientName = document.getElementById('ai_name').value.trim();
+
+  if (!clientName) {
+    alert('Enter client name first');
+    return;
+  }
+
+  const { data, error } = await sb
+    .from('clients')
+    .select('name, address')
+    .ilike('name', `%${clientName}%`)
+    .limit(1);
+
+  if (error || !data || data.length === 0) {
+    alert('No matching client found');
+    return;
+  }
+
+  document.getElementById('ai_address').value = data[0].address || '';
+}
+
+async function fetchAutoInvoiceNumber() {
+  const btn = document.querySelector('button[onclick="fetchAutoInvoiceNumber()"]');
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '…';
+
+  try {
+    const currentYear = new Date().getFullYear();
+
+    // Fetch all invoice numbers for the current year
+    const { data, error } = await sb
+      .from('clients')
+      .select('invoice_number')
+      .like('invoice_number', `${currentYear}/%`)
+      .order('invoice_number', { ascending: false })
+      .limit(1);
+
+    if (error) throw new Error(error.message);
+
+    let nextNumber = 1; // default if no invoices yet this year
+
+    if (data && data.length > 0) {
+      // invoice_number format: "2026/00001" → extract the numeric part
+      const lastInv  = data[0].invoice_number;          // e.g. "2026/00078"
+      const lastSeq  = parseInt(lastInv.split('/')[1]);  // → 78
+      nextNumber = lastSeq + 1;
+    }
+
+    // Pad to 5 digits: 79 → "00079"
+    const padded = String(nextNumber).padStart(5, '0');
+    document.getElementById('ai_invnum').value = `${currentYear}/${padded}`;
+    aiClearErr('ai_invnum');
+
+  } catch (err) {
+    alert('Could not fetch invoice number: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = orig;
+  }
+}
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
 </script>
 </body>
 </html>
