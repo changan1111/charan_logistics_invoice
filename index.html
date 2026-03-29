@@ -1051,7 +1051,7 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 window.addEventListener('DOMContentLoaded', async () => {
   const { data: { user } } = await sb.auth.getUser();
   if (!user) { window.location.replace('./login.html'); return; }
-  initApp();
+  initApp(user);
 });
 window.addEventListener('pageshow', async function(e) {
   if (e.persisted || performance.getEntriesByType('navigation')[0]?.type === 'back_forward') {
@@ -1116,7 +1116,11 @@ let ALL=[], SHOWN=[], activeFilter='all', curInv=null;
 let currentPage = 1;
 let pageSize = DEFAULT_PAGE_SIZE;
 
-function initApp() {
+function initApp(user) {
+    const addInvoiceBtn = document.getElementById('sb-addinvoice');
+  if (addInvoiceBtn) {
+    addInvoiceBtn.style.display = user.email === 'saranyasriram2014@gmail.com' ? '' : 'none';
+  }
   const savedName = localStorage.getItem('im_name') || 'Charan Logistics';
   const savedAddr = localStorage.getItem('im_addr') || '';
   const savedCur  = localStorage.getItem('im_cur')  || 'SGD ';
