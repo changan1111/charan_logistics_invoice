@@ -1343,10 +1343,27 @@ function openInv(num){
   const cur='S$';
   ge('mLabel').textContent = `Invoice #${inv.number} · ${inv.name}`;
   const hasItems = inv.items && inv.items.length;
-  const hasLineItemDates = hasItems && inv.items.some(li => getLineItemDate(li));
+
+  // ✅ Sort line items by date ascending, then by row id as tiebreaker
+  const sortedItems = hasItems
+    ? [...inv.items].sort((a, b) => {
+        const parseDate = (li) => {
+          const raw = getLineItemDate(li);
+          if (!raw) return 0;
+          const [dd, mm, yyyy] = raw.split(/[-\/]/);
+          if (!dd || !mm || !yyyy) return 0;
+          return new Date(`${yyyy}-${mm}-${dd}`).getTime();
+        };
+        const dateDiff = parseDate(a) - parseDate(b);
+        if (dateDiff !== 0) return dateDiff;
+        return (a.id ?? 0) - (b.id ?? 0);
+      })
+    : [];
+
+  const hasLineItemDates = hasItems && sortedItems.some(li => getLineItemDate(li));
   const showDateCol = hasLineItemDates;
   const rows = hasItems
-    ? inv.items.map(li=>{
+    ? sortedItems.map(li=>{
         const q=getQty(li),p=getPrice(li),d=getDesc(li);
         const liDate=getLineItemDate(li);
         return `<tr>${showDateCol?`<td class="date-col">${liDate||'—'}</td>`:''}<td>${d}</td><td class="c">${q}</td><td class="r">${cur} ${fmt(p)}</td><td class="r bold">${cur} ${fmt(q*p)}</td></tr>`;
@@ -1393,6 +1410,21 @@ function openInv(num){
     </div>`;
   ge('overlay').classList.add('open');
   document.body.style.overflow='hidden';
+}
+function sortLineItems(items) {
+  if (!items || !items.length) return [];
+  return [...items].sort((a, b) => {
+    const parseDate = (li) => {
+      const raw = getLineItemDate(li);
+      if (!raw) return 0;
+      const [dd, mm, yyyy] = raw.split(/[-\/]/);
+      if (!dd || !mm || !yyyy) return 0;
+      return new Date(`${yyyy}-${mm}-${dd}`).getTime();
+    };
+    const dateDiff = parseDate(a) - parseDate(b);
+    if (dateDiff !== 0) return dateDiff;
+    return (a.id ?? 0) - (b.id ?? 0);
+  });
 }
 function overlayClick(e){ if(e.target===ge('overlay')) closeModal(); }
 function closeModal(){ ge('overlay').classList.remove('open'); document.body.style.overflow=''; }
@@ -1486,7 +1518,7 @@ async function makePDF(inv){
   const hasLineItemDates=(inv.items||[]).some(li=>getLineItemDate(li));
   const tableY=partyY+14+aLines.length*5.5+3;
   const tableHead=hasLineItemDates?[['Date','Description','Qty','Rate','Amount']]:[['Description','Qty','Rate','Amount']];
-  const allRows=(inv.items||[]).map(li=>{
+  const allRows=sortLineItems(inv.items||[]).map(li=>{
     const q=getQty(li),p=getPrice(li),d=getDesc(li),liDate=getLineItemDate(li);
     if(hasLineItemDates) return [liDate||'—',d.toUpperCase(),String(q),cur+' '+fmt(p),cur+' '+fmt(q*p)];
     return [d.toUpperCase(),String(q),cur+' '+fmt(p),cur+' '+fmt(q*p)];
