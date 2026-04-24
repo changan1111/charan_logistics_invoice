@@ -1027,6 +1027,7 @@ tbody tr:hover td{background:var(--ice);cursor:pointer;}
         <button class="btn btn-white btn-sm" onclick="printInv()">🖨 Print</button>
         <button class="btn btn-primary btn-sm" onclick="dlPDF()">⬇ PDF</button>
         <button class="btn btn-white btn-sm" onclick="shareInv()">📤 Share</button>
+       <button class="btn btn-sm" id="markPaidBtn" onclick="markAsPaid()" style="background:#e4f7ee;color:#0a7a4b;border:1.5px solid #0a7a4b;">✓ Mark as Paid</button>
         <button class="xbtn" onclick="closeModal()">✕</button>
       </div>
     </div>
@@ -2566,6 +2567,59 @@ async function fetchAutoInvoiceNumber() {
     btn.innerHTML = orig;
   }
 }
+
+async function markAsPaid() {
+  if (!curInv) return;
+
+  if (curInv.status === 'paid') {
+    alert('This invoice is already marked as Paid.');
+    return;
+  }
+
+  const password = prompt(
+    `🔐 Enter your login password to mark Invoice #${curInv.number} as Paid:\n\n` +
+    `Client: ${curInv.name}\nAmount: S$ ${fmt(curInv.total)}`
+  );
+
+  if (password === null) return; // cancelled
+  if (!password.trim()) { alert('❌ Password cannot be empty.'); return; }
+
+  // Re-authenticate using current user's email + entered password
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) { alert('❌ Session expired. Please log in again.'); return; }
+
+  const { error: authError } = await sb.auth.signInWithPassword({
+    email: user.email,
+    password: password.trim()
+  });
+
+  if (authError) {
+    alert('❌ Incorrect password. Access denied.');
+    return;
+  }
+
+  // Confirmed — update status
+  const confirmed = confirm(
+    `✅ Password verified!\n\nMark Invoice #${curInv.number} (${curInv.name}) as PAID?\n\nAmount: S$ ${fmt(curInv.total)}`
+  );
+  if (!confirmed) return;
+
+  try {
+    const { error } = await sb
+      .from('clients')
+      .update({ status: 'paid' })
+      .eq('invoice_number', curInv.number);
+
+    if (error) throw error;
+
+    alert(`✅ Invoice #${curInv.number} marked as Paid!`);
+    closeModal();
+    await loadData();
+  } catch (err) {
+    alert('❌ Update failed: ' + err.message);
+  }
+}
+
 </script>
 </body>
 </html>
