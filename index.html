@@ -1027,11 +1027,103 @@ tbody tr:hover td{background:var(--ice);cursor:pointer;}
         <button class="btn btn-white btn-sm" onclick="printInv()">🖨 Print</button>
         <button class="btn btn-primary btn-sm" onclick="dlPDF()">⬇ PDF</button>
         <button class="btn btn-white btn-sm" onclick="shareInv()">📤 Share</button>
-       <button class="btn btn-sm" id="markPaidBtn" onclick="markAsPaid()" style="background:#e4f7ee;color:#0a7a4b;border:1.5px solid #0a7a4b;">✓ Mark as Paid</button>
+        <button class="btn btn-white btn-sm" onclick="openEditInvoiceModal()">✎ Edit</button>
+        <button class="btn btn-sm" id="markPaidBtn" onclick="markAsPaid()" style="background:#e4f7ee;color:#0a7a4b;border:1.5px solid #0a7a4b;">✓ Mark as Paid</button>
         <button class="xbtn" onclick="closeModal()">✕</button>
       </div>
     </div>
     <div id="invDoc"></div>
+  </div>
+</div>
+
+<!-- EDIT INVOICE MODAL -->
+<div class="overlay" id="editInvoiceOverlay" onclick="editInvoiceOverlayClick(event)">
+  <div class="modal" id="editInvoiceModal">
+    <div class="modal-bar">
+      <span class="modal-bar-lbl" id="editInvLabel">Edit Invoice</span>
+      <button class="xbtn" onclick="closeEditInvoiceModal()">✕</button>
+    </div>
+    <div style="padding: 1.5rem;">
+      <!-- Success / Error banner -->
+      <div id="ei-success" style="display:none;background:#e4f7ee;border:1.5px solid #0a7a4b;border-radius:10px;padding:14px 18px;margin-bottom:16px;font-size:.88rem;color:#0a7a4b;font-weight:600;">
+        ✅ <span id="ei-success-msg"></span>
+      </div>
+      <div id="ei-error" style="display:none;background:#fdeaea;border:1.5px solid #c0282e;border-radius:10px;padding:14px 18px;margin-bottom:16px;font-size:.88rem;color:#c0282e;font-weight:600;">
+        ❌ <span id="ei-error-msg"></span>
+      </div>
+
+      <!-- Invoice Header -->
+      <div class="pr-card">
+        <div class="pr-card-title">Invoice Details</div>
+        <div class="pr-form-grid">
+          <div class="pr-field">
+            <label>Invoice Number <span style="color:#c0282e">*</span></label>
+            <input type="text" id="ei_invnum" placeholder="e.g. 2026/00001" disabled style="background:#f5f5f5;cursor:not-allowed;"/>
+          </div>
+          <div class="pr-field">
+            <label>Billing Date <span style="color:#c0282e">*</span></label>
+            <input type="date" id="ei_billingdate" oninput="eiClearErr('ei_billingdate')"/>
+          </div>
+          <div class="pr-field">
+            <label>Status <span style="color:#c0282e">*</span></label>
+            <select id="ei_status" oninput="eiClearErr('ei_status')">
+              <option value="">— Select —</option>
+              <option value="pending">Pending</option>
+              <option value="paid">Paid</option>
+              <option value="overdue">Overdue</option>
+            </select>
+          </div>
+          <div class="pr-field span2">
+            <label>Client Name <span style="color:#c0282e">*</span></label>
+            <input type="text" id="ei_name" placeholder="e.g. ABC Pte Ltd" oninput="eiClearErr('ei_name')"/>
+          </div>
+          <div class="pr-field span2">
+            <label>Client Address</label>
+            <input type="text" id="ei_address" placeholder="e.g. 10 Anson Road, Singapore 079903"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Line Items -->
+      <div class="pr-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div class="pr-card-title" style="margin-bottom:0;padding-bottom:0;border-bottom:none;">Line Items</div>
+          <button class="qt-add-row-btn" style="margin-top:0" onclick="eiAddRow()">+ Add Row</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="qt-items-table" style="min-width:580px">
+            <thead><tr>
+              <th style="width:36px">#</th>
+              <th>Date</th>
+              <th>Description <span style="color:#f0d080">*</span></th>
+              <th style="width:70px;text-align:center">Qty <span style="color:#f0d080">*</span></th>
+              <th style="width:120px;text-align:right">Rate (S$) <span style="color:#f0d080">*</span></th>
+              <th style="width:120px;text-align:right">Amount (S$)</th>
+              <th style="width:36px"></th>
+            </tr></thead>
+            <tbody id="ei_tbody"></tbody>
+          </table>
+        </div>
+        <!-- Totals -->
+        <div style="display:flex;justify-content:flex-end;margin-top:12px;gap:24px;align-items:center;flex-wrap:wrap;">
+          <div style="text-align:right">
+            <div style="font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:#7a6e58">Total Amount</div>
+            <div style="font-size:1.6rem;font-weight:700;font-family:'Outfit',serif;color:var(--gold)" id="ei_total">S$ 0.00</div>
+          </div>
+        </div>
+        <div style="margin-top:8px;font-size:.75rem;color:var(--muted)">
+          💡 Total is auto-calculated from line items. At least one line item with Description, Qty and Rate is required.
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="pr-actions">
+        <button class="btn btn-outline" onclick="closeEditInvoiceModal()">✕ Cancel</button>
+        <button class="btn btn-primary" id="ei-submit-btn" onclick="eiSubmit()">
+          ☁ Save Changes
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -2351,7 +2443,7 @@ function aiClearRowErr(n) {
 }
 
 function aiReset() {
-  ['ai_invnum','ai_billingdate','ai_duedate','ai_name','ai_address'].forEach(id => {
+  ['ai_invnum','ai_billingdate','ai_name','ai_address'].forEach(id => {
     const el = ge(id);
     if(el){ el.value = ''; el.classList.remove('error'); }
   });
@@ -2493,7 +2585,7 @@ async function aiSubmit() {
       `Total: S$ ${total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
     ge('ai-success').scrollIntoView({ behavior:'smooth', block:'nearest' });
 
-    setTimeout(() => loadData(), 1000);
+    setTimeout(() => { loadData(); aiReset(); }, 1000);
 
   } catch(err) {
     ge('ai-error').style.display = 'block';
@@ -2567,7 +2659,6 @@ async function fetchAutoInvoiceNumber() {
     btn.innerHTML = orig;
   }
 }
-
 async function markAsPaid() {
   if (!curInv) return;
 
@@ -2620,17 +2711,284 @@ async function markAsPaid() {
   }
 }
 
-</script>
-</body>
-</html>
+// ══════════════════════════════════════════════════════════════
+//  EDIT INVOICE FUNCTIONS
+// ══════════════════════════════════════════════════════════════
+let eiRowId = 0;
 
+function openEditInvoiceModal() {
+  if (!curInv) return;
+  
+  // Initialize edit form with current invoice data
+  ge('ei_invnum').value = curInv.number || '';
+  
+  // Convert billing date: DD-MM-YYYY → YYYY-MM-DD (for date input)
+  const billingDateRaw = curInv.billingDate || '';
+  let billingDateISO = '';
+  if (billingDateRaw) {
+    const parts = billingDateRaw.split('-');
+    if (parts.length === 3) {
+      const [dd, mm, yyyy] = parts;
+      billingDateISO = `${yyyy}-${mm}-${dd}`;
+    }
+  }
+  ge('ei_billingdate').value = billingDateISO;
+  ge('ei_status').value = curInv.status || '';
+  ge('ei_name').value = curInv.name || '';
+  ge('ei_address').value = curInv.addr || '';
+  
+  // Clear previous line items
+  ge('ei_tbody').innerHTML = '';
+  eiRowId = 0;
+  
+  // Populate line items with same sort order as view modal (by date ascending)
+  if (curInv.items && curInv.items.length > 0) {
+    // Sort line items by date ascending, then by row id as tiebreaker (same as view modal)
+    const sortedItems = [...curInv.items].sort((a, b) => {
+      const parseDate = (li) => {
+        const raw = getLineItemDate(li);
+        if (!raw) return 0;
+        const [dd, mm, yyyy] = raw.split(/[-\/]/);
+        if (!dd || !mm || !yyyy) return 0;
+        return new Date(`${yyyy}-${mm}-${dd}`).getTime();
+      };
+      const dateDiff = parseDate(a) - parseDate(b);
+      if (dateDiff !== 0) return dateDiff;
+      return (a.id ?? 0) - (b.id ?? 0);
+    });
+    
+    sortedItems.forEach(li => {
+      let date = getLineItemDate(li) || '';
+      // Convert date from DD-MM-YYYY to YYYY-MM-DD for date input
+      if (date) {
+        const parts = date.split('-');
+        if (parts.length === 3) {
+          const [dd, mm, yyyy] = parts;
+          date = `${yyyy}-${mm}-${dd}`;
+        }
+      }
+      const desc = getDesc(li) || '';
+      const qty = getQty(li) || '';
+      const rate = getPrice(li) || '';
+      eiAddRow(date, desc, qty, rate);
+    });
+  } else {
+    // Add 3 blank rows if no items
+    eiAddRow(); eiAddRow(); eiAddRow();
+  }
+  
+  eiCalcTotal();
+  ge('ei-success').style.display = 'none';
+  ge('ei-error').style.display = 'none';
+  
+  // Open edit modal
+  ge('editInvoiceOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
 
+function closeEditInvoiceModal() {
+  ge('editInvoiceOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
 
+function editInvoiceOverlayClick(e) {
+  if (e.target === ge('editInvoiceOverlay')) {
+    closeEditInvoiceModal();
+  }
+}
 
+function eiAddRow(date='', desc='', qty='', rate='') {
+  eiRowId++;
+  const n = eiRowId;
+  const idx = ge('ei_tbody').children.length + 1;
+  const tr = document.createElement('tr');
+  tr.id = 'eirow' + n;
+  tr.innerHTML = `
+    <td style="text-align:center;color:#7a6e58;font-weight:600;font-size:.82rem">${idx}</td>
+    <td><input type="date" value="${date}" oninput="eiCalcTotal()" style="min-width:130px"/></td>
+    <td><input type="text" placeholder="Description" value="${desc}" oninput="eiClearRowErr(${n});eiCalcTotal()"/></td>
+    <td><input type="number" placeholder="1" value="${qty}" min="0.01" step="0.01" oninput="eiClearRowErr(${n});eiCalcTotal()" style="text-align:center"/></td>
+    <td><input type="number" placeholder="0.00" value="${rate}" min="0" step="0.01" oninput="eiClearRowErr(${n});eiCalcTotal()" style="text-align:right"/></td>
+    <td style="text-align:right;font-weight:600;font-size:.85rem;color:var(--ink)" id="eiamt${n}">S$ 0.00</td>
+    <td><button class="qt-del-btn" onclick="eiDelRow(${n})" title="Remove row">✕</button></td>`;
+  ge('ei_tbody').appendChild(tr);
+  eiCalcTotal();
+}
 
+function eiDelRow(n) {
+  ge('eirow' + n)?.remove();
+  // renumber
+  [...ge('ei_tbody').children].forEach((r, i) => r.cells[0].textContent = i + 1);
+  eiCalcTotal();
+}
 
+function eiCalcTotal() {
+  let total = 0;
+  [...ge('ei_tbody').querySelectorAll('tr')].forEach(r => {
+    const qty  = parseFloat(r.cells[3].querySelector('input').value) || 0;
+    const rate = parseFloat(r.cells[4].querySelector('input').value) || 0;
+    const amt  = qty * rate;
+    total += amt;
+    const id = r.id.replace('eirow','');
+    const el = ge('eiamt' + id);
+    if(el) el.textContent = 'S$ ' + amt.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  });
+  ge('ei_total').textContent = 'S$ ' + total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  return total;
+}
 
+function eiClearErr(id) {
+  ge(id)?.classList.remove('error');
+}
 
+function eiClearRowErr(n) {
+  const row = ge('eirow' + n);
+  if(row) row.querySelectorAll('input').forEach(i => i.classList.remove('error'));
+}
+
+async function eiSubmit() {
+  // Hide banners
+  ge('ei-success').style.display = 'none';
+  ge('ei-error').style.display = 'none';
+
+  // Validate header fields
+  let valid = true;
+  const req = [
+    { id:'ei_billingdate',label:'Billing Date'   },
+    { id:'ei_status',     label:'Status'         },
+    { id:'ei_name',       label:'Client Name'    },
+  ];
+  req.forEach(({id}) => {
+    const el = ge(id);
+    if (!el.value.trim()) { el.classList.add('error'); valid = false; }
+  });
+  if (!valid) {
+    ge('ei-error').style.display = 'block';
+    ge('ei-error-msg').textContent = 'Please fill all required fields marked with *.';
+    ge('ei-error').scrollIntoView({ behavior:'smooth', block:'nearest' });
+    return;
+  }
+
+  // Convert billing date: YYYY-MM-DD → DD-MM-YYYY
+  const billingDateRaw = ge('ei_billingdate').value;
+  const [by, bm, bd] = billingDateRaw.split('-');
+  const billingDate = `${bd}-${bm}-${by}`;
+
+  // Validate line items
+  const rows = [...ge('ei_tbody').querySelectorAll('tr')];
+  const lineItems = [];
+  let liValid = true, hasAtLeastOne = false;
+
+  rows.forEach(r => {
+    const desc      = r.cells[2].querySelector('input').value.trim();
+    const qty       = parseFloat(r.cells[3].querySelector('input').value);
+    const rate      = parseFloat(r.cells[4].querySelector('input').value);
+    const dateInput = r.cells[1].querySelector('input');
+
+    // Skip fully blank rows
+    if (!desc && !qty && !rate) return;
+
+    hasAtLeastOne = true;
+    let rowOk = true;
+
+    if (!desc)               { r.cells[2].querySelector('input').classList.add('error'); liValid=false; rowOk=false; }
+    if (!qty || qty <= 0)    { r.cells[3].querySelector('input').classList.add('error'); liValid=false; rowOk=false; }
+    if (isNaN(rate)||rate<0) { r.cells[4].querySelector('input').classList.add('error'); liValid=false; rowOk=false; }
+
+    // Convert line-item date: YYYY-MM-DD → DD-MM-YYYY (null if blank)
+    let dateVal = null;
+    if (dateInput.value) {
+      const [y, m, d] = dateInput.value.split('-');
+      dateVal = `${d}-${m}-${y}`;
+    }
+
+    if (rowOk) {
+      lineItems.push({
+        invoice_number: ge('ei_invnum').value.trim(),
+        description:    desc,
+        qty:            qty,
+        unit_price:     rate,
+        date:           dateVal,
+      });
+    }
+  });
+
+  if (!hasAtLeastOne) {
+    ge('ei-error').style.display = 'block';
+    ge('ei-error-msg').textContent = 'Please add at least one line item with Description, Qty and Rate.';
+    return;
+  }
+  if (!liValid) {
+    ge('ei-error').style.display = 'block';
+    ge('ei-error-msg').textContent = 'Some line items have missing or invalid fields. Please fix them.';
+    ge('ei-error').scrollIntoView({ behavior:'smooth', block:'nearest' });
+    return;
+  }
+
+  // Calculate total
+  const total = lineItems.reduce((s, li) => s + (li.qty * li.unit_price), 0);
+
+  // Build client record
+  const clientRecord = {
+    invoice_number: ge('ei_invnum').value.trim(),
+    name:           ge('ei_name').value.trim(),
+    address:        ge('ei_address').value.trim() || null,
+    billing_date:   billingDate,
+    status:         ge('ei_status').value,
+    total:          total,
+  };
+
+  // Disable button / show loading
+  const btn  = ge('ei-submit-btn');
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-sm"></span> Saving…';
+
+  try {
+    // 1. Upsert into clients
+    const { error: e1 } = await sb
+      .from('clients')
+      .upsert(clientRecord, { onConflict: 'invoice_number' });
+    if (e1) throw new Error('clients table: ' + e1.message);
+
+    // 2. Delete existing line items for this invoice
+    const { error: e2 } = await sb
+      .from('line_items')
+      .delete()
+      .eq('invoice_number', clientRecord.invoice_number);
+    if (e2) throw new Error('clearing line_items: ' + e2.message);
+
+    // 3. Insert new line items
+    const { error: e3 } = await sb
+      .from('line_items')
+      .insert(lineItems);
+    if (e3) throw new Error('line_items table: ' + e3.message);
+
+    // Success
+    ge('ei-success').style.display = 'block';
+    ge('ei-success-msg').textContent =
+      `Invoice ${clientRecord.invoice_number} updated! ` +
+      `${lineItems.length} line item${lineItems.length !== 1 ? 's' : ''} · ` +
+      `Total: S$ ${total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+    ge('ei-success').scrollIntoView({ behavior:'smooth', block:'nearest' });
+
+    setTimeout(() => {
+      loadData().then(()=>{;
+      closeEditInvoiceModal();
+      // Reload the invoice display
+      openInv(clientRecord.invoice_number);
+      })
+    }, 1000);
+
+  } catch(err) {
+    ge('ei-error').style.display = 'block';
+    ge('ei-error-msg').textContent = 'Save failed: ' + err.message;
+    ge('ei-error').scrollIntoView({ behavior:'smooth', block:'nearest' });
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = orig;
+  }
+}
 
 </script>
 </body>
