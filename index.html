@@ -2609,6 +2609,7 @@ async function fetchClientAddress() {
     .from('clients')
     .select('name, address')
     .ilike('name', `%${clientName}%`)
+    .order('updated_at', { ascending: false }) // latest first
     .limit(1);
 
   if (error || !data || data.length === 0) {
