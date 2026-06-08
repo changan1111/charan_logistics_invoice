@@ -484,6 +484,406 @@ tbody tr:hover td{background:var(--ice);cursor:pointer;}
   max-width: 100% !important;
   height: auto !important;
 }
+/* ── QUICK INVOICE CHATBOT ──────────────────────────────────── */
+#qic-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9000;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--navy), var(--sky));
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(11,29,58,.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  transition: all .25s cubic-bezier(.34,1.4,.64,1);
+  color: white;
+}
+#qic-fab:hover {
+  transform: scale(1.12);
+  box-shadow: 0 8px 30px rgba(11,29,58,.5);
+}
+#qic-fab .qic-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 18px;
+  height: 18px;
+  background: #25D366;
+  border-radius: 50%;
+  font-size: .58rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  color: white;
+  display: none;
+}
+
+#qic-panel {
+  position: fixed;
+  bottom: 92px;
+  right: 24px;
+  z-index: 9000;
+  width: 360px;
+  max-height: 580px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 24px 60px rgba(11,29,58,.22), 0 0 0 1px rgba(11,29,58,.06);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: scale(.92) translateY(16px);
+  opacity: 0;
+  pointer-events: none;
+  transition: all .28s cubic-bezier(.34,1.4,.64,1);
+}
+#qic-panel.open {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+  pointer-events: all;
+}
+@media (max-width: 480px) {
+  #qic-panel {
+    width: calc(100vw - 24px);
+    right: 12px;
+    bottom: 80px;
+    max-height: 70vh;
+  }
+  #qic-fab { bottom: 16px; right: 16px; }
+}
+
+.qic-head {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--mid) 100%);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.qic-head-ico {
+  width: 36px;
+  height: 36px;
+  background: rgba(255,255,255,.15);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.qic-head-info { flex: 1; }
+.qic-head-title {
+  font-size: .9rem;
+  font-weight: 700;
+  color: white;
+  line-height: 1.2;
+}
+.qic-head-sub {
+  font-size: .68rem;
+  color: rgba(255,255,255,.55);
+  margin-top: 1px;
+}
+.qic-head-close {
+  background: rgba(255,255,255,.12);
+  border: none;
+  border-radius: 8px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  color: white;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s;
+  flex-shrink: 0;
+}
+.qic-head-close:hover { background: rgba(255,255,255,.22); }
+
+.qic-disclaimer {
+  background: #fff8e8;
+  border-bottom: 1px solid #f0d080;
+  padding: 8px 14px;
+  font-size: .7rem;
+  color: #7a5c10;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.qic-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  scroll-behavior: smooth;
+}
+.qic-messages::-webkit-scrollbar { width: 3px; }
+.qic-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.qic-msg {
+  display: flex;
+  flex-direction: column;
+  animation: qicMsgIn .22s ease both;
+}
+@keyframes qicMsgIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+.qic-msg.bot { align-items: flex-start; }
+.qic-msg.user { align-items: flex-end; }
+
+.qic-bubble {
+  max-width: 86%;
+  padding: 9px 13px;
+  border-radius: 16px;
+  font-size: .82rem;
+  line-height: 1.5;
+}
+.qic-msg.bot .qic-bubble {
+  background: var(--pale);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  border-bottom-left-radius: 4px;
+}
+.qic-msg.user .qic-bubble {
+  background: linear-gradient(135deg, var(--navy), var(--mid));
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+/* Option buttons */
+.qic-opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+  max-width: 88%;
+}
+.qic-opt {
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1.5px solid var(--sky);
+  background: white;
+  color: var(--sky);
+  font-size: .78rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'Outfit', sans-serif;
+  transition: all .15s;
+  white-space: nowrap;
+}
+.qic-opt:hover {
+  background: var(--sky);
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* Client match list */
+.qic-matches {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+  max-width: 90%;
+}
+.qic-match-item {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: white;
+  cursor: pointer;
+  transition: all .15s;
+  font-size: .8rem;
+}
+.qic-match-item:hover {
+  border-color: var(--sky);
+  background: var(--ice);
+}
+.qic-match-name { font-weight: 600; color: var(--ink); }
+.qic-match-addr { font-size: .72rem; color: var(--muted); margin-top: 2px; }
+
+/* Summary card */
+.qic-summary {
+  background: var(--pale);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: .8rem;
+  margin-top: 6px;
+  max-width: 94%;
+}
+.qic-summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink);
+}
+.qic-summary-row:last-child { border-bottom: none; }
+.qic-summary-row .lbl { color: var(--muted); font-size: .73rem; }
+.qic-summary-total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 2px solid var(--navy);
+  font-weight: 700;
+  color: var(--navy);
+  font-size: .9rem;
+}
+
+/* Typing indicator */
+.qic-typing {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 14px;
+  background: var(--pale);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  border-bottom-left-radius: 4px;
+  width: fit-content;
+}
+.qic-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--muted);
+  animation: qicDot 1.2s infinite ease-in-out;
+}
+.qic-dot:nth-child(2) { animation-delay: .2s; }
+.qic-dot:nth-child(3) { animation-delay: .4s; }
+@keyframes qicDot {
+  0%,80%,100% { transform: scale(.7); opacity:.5; }
+  40%         { transform: scale(1);  opacity: 1; }
+}
+
+/* Input area */
+.qic-input-area {
+  padding: 10px 12px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  flex-shrink: 0;
+  background: white;
+}
+.qic-input-area input,
+.qic-input-area textarea {
+  flex: 1;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-family: 'Outfit', sans-serif;
+  font-size: .83rem;
+  color: var(--ink);
+  outline: none;
+  resize: none;
+  transition: border-color .15s;
+  max-height: 80px;
+  line-height: 1.4;
+}
+.qic-input-area input:focus,
+.qic-input-area textarea:focus { border-color: var(--sky); }
+.qic-send {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--sky);
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all .15s;
+}
+.qic-send:hover { background: var(--steel); transform: scale(1.05); }
+.qic-send:disabled { background: var(--border); cursor: not-allowed; transform: none; }
+
+/* Reset / start fresh link */
+.qic-restart {
+  text-align: center;
+  padding: 6px;
+  font-size: .72rem;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+  background: white;
+}
+.qic-restart a {
+  color: var(--sky);
+  cursor: pointer;
+  text-decoration: none;
+}
+.qic-restart a:hover { text-decoration: underline; }
+
+/* Success result */
+.qic-result {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+.qic-result-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.qic-result-btn {
+  padding: 7px 14px;
+  border-radius: 10px;
+  font-size: .78rem;
+  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  cursor: pointer;
+  border: none;
+  transition: all .15s;
+}
+.qic-result-btn.primary {
+  background: linear-gradient(135deg, var(--navy), var(--mid));
+  color: white;
+}
+.qic-result-btn.secondary {
+  background: var(--pale);
+  color: var(--ink);
+  border: 1.5px solid var(--border);
+}
+.qic-result-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(11,29,58,.15); }
+
+/* Calendar input styling */
+.qic-date-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+  max-width: 90%;
+}
+.qic-date-input {
+  padding: 8px 12px;
+  border: 1.5px solid var(--sky);
+  border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: .83rem;
+  color: var(--ink);
+  outline: none;
+  width: 100%;
+  background: white;
+}
+.qic-date-input:focus { box-shadow: 0 0 0 3px rgba(59,130,196,.15); }
 </style>
 </head>
 <body>
@@ -2990,7 +3390,694 @@ async function eiSubmit() {
     btn.innerHTML = orig;
   }
 }
+const QIC = {
+  open: false,
+  step: 0,
+  data: {
+    clientName:           null,
+    clientAddress:        null,
+    billingDate:          null,
+    billingDateDisplay:   null,
+    deliveryDate:         null,
+    deliveryDateDisplay:  null,
+    status:               null,
+    description:          null,
+    qty:                  null,
+    rate:                 null,
+    invoiceNumber:        null,
+    isNewClient:          false,
+  },
+  matchedClients: [],
+};
+
+// ── TOGGLE ─────────────────────────────────────────────────
+function qicToggle() {
+  QIC.open = !QIC.open;
+  document.getElementById('qic-panel').classList.toggle('open', QIC.open);
+  if (QIC.open && QIC.step === 0) {
+    qicStart();
+  }
+  if (QIC.open) {
+    setTimeout(() => document.getElementById('qic-input').focus(), 300);
+  }
+}
+
+// ── START ───────────────────────────────────────────────────
+function qicStart() {
+  qicReset(false);
+  qicBot('👋 Hi! Let\'s create a quick invoice.\n\nWhich client is this for?');
+  qicShowInput('text', 'Type client name…');
+  QIC.step = 1;
+}
+
+function qicRestart() {
+  qicReset(true);
+  qicStart();
+}
+
+function qicReset(clearMessages) {
+  QIC.step = 0;
+  QIC.data = {
+    clientName: null, clientAddress: null,
+    billingDate: null, billingDateDisplay: null,
+    deliveryDate: null, deliveryDateDisplay: null,
+    status: null, description: null, qty: null, rate: null,
+    invoiceNumber: null, isNewClient: false,
+  };
+  QIC.matchedClients = [];
+  if (clearMessages) {
+    document.getElementById('qic-messages').innerHTML = '';
+  }
+  qicShowInput('text', 'Type here…');
+}
+
+// ── SEND ────────────────────────────────────────────────────
+async function qicSend() {
+  const input = document.getElementById('qic-input');
+  const val   = input.value.trim();
+  if (!val) return;
+  input.value = '';
+
+  qicUser(val);
+  qicDisableInput();
+
+  switch (QIC.step) {
+    case 1: await qicHandleClientName(val); break;
+    case 2: qicHandleNewAddress(val);       break;
+    case 4: qicHandleLineDesc(val);         break;
+    case 5: qicHandleLineQty(val);          break;
+    case 6: qicHandleLineRate(val);         break;
+    default: qicEnableInput(); break;
+  }
+}
+
+// ── STEP 1: CLIENT NAME ─────────────────────────────────────
+async function qicHandleClientName(name) {
+  qicTyping();
+  // Search existing clients
+  const { data, error } = await sb
+    .from('clients')
+    .select('name, address')
+    .ilike('name', `%${name}%`)
+    .order('billing_date', { ascending: false })
+    .limit(6);
+
+  qicRemoveTyping();
+
+  if (error || !data || data.length === 0) {
+    // New client
+    QIC.data.clientName   = name;
+    QIC.data.isNewClient  = true;
+    QIC.step = 2;
+    qicBot(`No client found matching <strong>"${name}"</strong>.\n\nPlease enter their address:`);
+    qicShowInput('text', 'e.g. 10 Anson Road, Singapore 079903');
+    return;
+  }
+
+  // Deduplicate by name
+  const seen = new Set();
+  const unique = data.filter(c => {
+    const key = (c.name || '').toLowerCase().trim();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  if (unique.length === 1) {
+    // Exact single match
+    qicSelectClient(unique[0].name, unique[0].address);
+    return;
+  }
+
+  // Multiple matches — show list
+  QIC.matchedClients = unique;
+  QIC.step = 'pick_client';
+  qicHideInput();
+  qicBotWithClients(
+    `Found ${unique.length} matching clients. Which one?`,
+    unique
+  );
+}
+
+function qicSelectClient(name, address) {
+  QIC.data.clientName    = name;
+  QIC.data.clientAddress = address || '';
+  QIC.step = 3;
+
+  let msg = `✅ <strong>${name}</strong>`;
+  if (address) {
+    msg += `\n📍 ${address}\n\nIs this the right address?`;
+    qicBot(msg);
+    qicOpts(['✅ Yes, correct', '✏️ Edit address'], (choice) => {
+      if (choice === '✏️ Edit address') {
+        QIC.step = 2;
+        qicBot('Enter the correct address:');
+        qicShowInput('text', 'e.g. 10 Anson Road, Singapore 079903');
+      } else {
+        qicMoveToDate();
+      }
+    });
+  } else {
+    msg += '\n\nNo address on file. Enter their address:';
+    qicBot(msg);
+    QIC.step = 2;
+    qicShowInput('text', 'e.g. 10 Anson Road, Singapore 079903');
+  }
+}
+
+// ── STEP 2: ADDRESS ─────────────────────────────────────────
+function qicHandleNewAddress(addr) {
+  QIC.data.clientAddress = addr;
+  qicMoveToDate();
+}
+
+// ── STEP 3: BILLING DATE ────────────────────────────────────
+function qicMoveToDate() {
+  QIC.step = 3;
+  qicHideInput();
+  const today = new Date().toISOString().slice(0, 10);
+  qicBot('📅 Choose the billing date:');
+  qicBotWithDate(today);
+}
+
+function qicHandleDate(dateVal) {
+  if (!dateVal) { qicBot('⚠️ Please pick a valid date.'); return; }
+  // Convert YYYY-MM-DD → DD-MM-YYYY for storage
+  const [y, m, d] = dateVal.split('-');
+  QIC.data.billingDate = `${d}-${m}-${y}`;
+  QIC.data.billingDateDisplay = new Date(dateVal).toLocaleDateString('en-GB', {
+    day: '2-digit', month: 'short', year: 'numeric'
+  });
+  qicMoveToStatus();
+}
+
+// ── STEP 3b: STATUS ─────────────────────────────────────────
+function qicMoveToStatus() {
+  QIC.step = 'pick_status';
+  qicHideInput();
+  qicBot('💳 Payment status?');
+  qicOpts(['⏳ Pending', '✅ Paid', '🔴 Overdue'], (choice) => {
+    const map = { '⏳ Pending': 'pending', '✅ Paid': 'paid', '🔴 Overdue': 'overdue' };
+    QIC.data.status = map[choice];
+    qicMoveToLineItem();
+  });
+}
+
+// ── STEP 4: LINE ITEM DESC ───────────────────────────────────
+function qicMoveToLineItem() {
+  QIC.step = 4;
+  qicBot('📋 Line item description?\n\n<em style="font-size:.75rem;color:var(--muted)">e.g. Container delivery, Lorry trip, Van rental</em>');
+  qicShowInput('text', 'e.g. Container delivery');
+}
+
+function qicHandleLineDesc(desc) {
+  QIC.data.description = desc;
+  qicMoveToDeliveryDate();
+}
+
+// ── STEP 4b: DELIVERY DATE ───────────────────────────────────
+function qicMoveToDeliveryDate() {
+  QIC.step = 'pick_delivery_date';
+  qicHideInput();
+  // Default = billing date (most common case)
+  const billingISO = QIC.data.billingDate
+    ? QIC.data.billingDate.split('-').reverse().join('-')   // DD-MM-YYYY → YYYY-MM-DD
+    : new Date().toISOString().slice(0, 10);
+
+  qicBot('📦 When was the delivery / service date?\n\n<em style="font-size:.75rem;color:var(--muted)">This date appears on the line item — may differ from billing date.</em>');
+  qicBotWithDeliveryDate(billingISO);
+}
+
+function qicHandleDeliveryDate(dateVal) {
+  if (!dateVal) { qicBot('⚠️ Please pick a valid date.'); return; }
+  const [y, m, d] = dateVal.split('-');
+  QIC.data.deliveryDate        = `${d}-${m}-${y}`;
+  QIC.data.deliveryDateDisplay = new Date(dateVal).toLocaleDateString('en-GB', {
+    day: '2-digit', month: 'short', year: 'numeric'
+  });
+  QIC.step = 5;
+  qicBot('How many? <em style="font-size:.75rem;color:var(--muted)">(Qty)</em>');
+  qicShowInput('number', 'e.g. 1');
+}
+
+// ── STEP 5: QTY ─────────────────────────────────────────────
+function qicHandleLineQty(val) {
+  const qty = parseFloat(val);
+  if (!qty || qty <= 0) {
+    qicBot('⚠️ Please enter a valid quantity (e.g. 1, 3, 0.5)');
+    qicEnableInput();
+    return;
+  }
+  QIC.data.qty = qty;
+  QIC.step = 6;
+  qicBot('Rate per unit? (S$)');
+  qicShowInput('number', 'e.g. 180.00');
+}
+
+// ── STEP 6: RATE ─────────────────────────────────────────────
+function qicHandleLineRate(val) {
+  const rate = parseFloat(val);
+  if (isNaN(rate) || rate < 0) {
+    qicBot('⚠️ Please enter a valid rate (e.g. 180.00)');
+    qicEnableInput();
+    return;
+  }
+  QIC.data.rate = rate;
+  qicMoveToSummary();
+}
+
+// ── SUMMARY ──────────────────────────────────────────────────
+function qicMoveToSummary() {
+  QIC.step = 'confirm';
+  qicHideInput();
+  const d = QIC.data;
+  const total = (d.qty * d.rate).toFixed(2);
+  const statusLabel = { pending: '⏳ Pending', paid: '✅ Paid', overdue: '🔴 Overdue' }[d.status];
+
+  qicBot('Here\'s your invoice summary:');
+  qicBotSummary({
+    'Client':         d.clientName,
+    'Address':        d.clientAddress || '—',
+    'Billing Date':   d.billingDateDisplay,
+    'Status':         statusLabel,
+    'Description':    d.description,
+    'Delivery Date':  d.deliveryDateDisplay,
+    'Qty × Rate':     `${d.qty} × S$ ${parseFloat(d.rate).toFixed(2)}`,
+  }, `S$ ${parseFloat(total).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}`);
+
+  qicOpts(['✅ Confirm & Save', '🔄 Start Fresh'], async (choice) => {
+    if (choice === '🔄 Start Fresh') {
+      qicRestart();
+      return;
+    }
+    await qicSaveInvoice();
+  });
+}
+
+// ── SAVE ─────────────────────────────────────────────────────
+async function qicSaveInvoice() {
+  qicTyping();
+  const d = QIC.data;
+
+  try {
+    // 1. Get next invoice number
+    const currentYear = new Date().getFullYear();
+    const { data: lastInvData } = await sb
+      .from('clients')
+      .select('invoice_number')
+      .like('invoice_number', `${currentYear}/%`)
+      .order('invoice_number', { ascending: false })
+      .limit(1);
+
+    let nextNum = 1;
+    if (lastInvData && lastInvData.length > 0) {
+      const lastSeq = parseInt(lastInvData[0].invoice_number.split('/')[1]);
+      nextNum = lastSeq + 1;
+    }
+    const invNum = `${currentYear}/${String(nextNum).padStart(5, '0')}`;
+    QIC.data.invoiceNumber = invNum;
+
+    const total = d.qty * d.rate;
+
+    // 2. Upsert client
+    const { error: e1 } = await sb.from('clients').upsert({
+      invoice_number: invNum,
+      name:           d.clientName,
+      address:        d.clientAddress || null,
+      billing_date:   d.billingDate,
+      status:         d.status,
+      total:          total,
+    }, { onConflict: 'invoice_number' });
+    if (e1) throw new Error(e1.message);
+
+    // 3. Insert line item
+    const { error: e2 } = await sb.from('line_items').insert([{
+      invoice_number: invNum,
+      description:    d.description,
+      qty:            d.qty,
+      unit_price:     d.rate,
+      date:           d.deliveryDate,   // ← delivery date, not billing date
+    }]);
+    if (e2) throw new Error(e2.message);
+
+    qicRemoveTyping();
+
+    // 4. Success!
+    qicBot(`🎉 Invoice <strong>${invNum}</strong> saved!\n\n<strong>${d.clientName}</strong>\nS$ ${total.toLocaleString('en-IN', {minimumFractionDigits:2})}`);
+    qicBotActions(invNum);
+
+    // Refresh main invoice list silently
+    loadData();
+    QIC.step = 'done';
+
+  } catch (err) {
+    qicRemoveTyping();
+    qicBot(`❌ Save failed: ${err.message}\n\nPlease try again.`);
+    qicOpts(['🔄 Try Again', '✕ Cancel'], (choice) => {
+      if (choice === '🔄 Try Again') qicSaveInvoice();
+      else qicRestart();
+    });
+  }
+}
+
+// ── POST-SAVE ACTIONS ────────────────────────────────────────
+function qicBotActions(invNum) {
+  const wrap = document.createElement('div');
+  wrap.className = 'qic-msg bot';
+
+  const actDiv = document.createElement('div');
+  actDiv.className = 'qic-result-actions';
+
+  // PDF Download button
+  const pdfBtn = document.createElement('button');
+  pdfBtn.className = 'qic-result-btn primary';
+  pdfBtn.textContent = '⬇ Download PDF';
+  pdfBtn.onclick = async () => {
+    pdfBtn.textContent = '⏳ Generating…';
+    pdfBtn.disabled = true;
+    // Find invoice in ALL array (after loadData refresh)
+    const tryPDF = async (retries = 3) => {
+      const inv = ALL.find(i => i.number === invNum);
+      if (inv) {
+        const blob = await makePDF(inv);
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href = url;
+        const runNum     = invNum.split('/').pop();
+        const clientName = (inv.name || 'Client').replace(/[^a-zA-Z0-9\s]/g,'').replace(/\s+/g,'_').trim();
+        const dateStr    = (inv.billingDate || '').replace(/\//g,'-');
+        a.download = `${runNum}_${clientName}_Invoice_${dateStr}.pdf`;
+        a.click();
+        URL.revokeObjectURL(url);
+        pdfBtn.textContent = '✅ Downloaded';
+      } else if (retries > 0) {
+        setTimeout(() => tryPDF(retries - 1), 800);
+      } else {
+        pdfBtn.textContent = '⚠️ Not found — reload';
+        pdfBtn.disabled = false;
+      }
+    };
+    tryPDF();
+  };
+
+  // View Invoice button
+  const viewBtn = document.createElement('button');
+  viewBtn.className = 'qic-result-btn secondary';
+  viewBtn.textContent = '👁 View';
+  viewBtn.onclick = () => {
+    const inv = ALL.find(i => i.number === invNum);
+    if (inv) { openInv(invNum); qicToggle(); }
+    else { alert('Invoice loading, please wait a moment.'); }
+  };
+
+  // New Invoice button
+  const newBtn = document.createElement('button');
+  newBtn.className = 'qic-result-btn secondary';
+  newBtn.textContent = '➕ New Invoice';
+  newBtn.onclick = () => qicRestart();
+
+  actDiv.appendChild(pdfBtn);
+  actDiv.appendChild(viewBtn);
+  actDiv.appendChild(newBtn);
+  wrap.appendChild(actDiv);
+  document.getElementById('qic-messages').appendChild(wrap);
+  qicScrollBottom();
+}
+
+// ── UI HELPERS ───────────────────────────────────────────────
+function qicBot(html) {
+  const wrap = document.createElement('div');
+  wrap.className = 'qic-msg bot';
+  const bubble = document.createElement('div');
+  bubble.className = 'qic-bubble';
+  bubble.innerHTML = html.replace(/\n/g, '<br>');
+  wrap.appendChild(bubble);
+  document.getElementById('qic-messages').appendChild(wrap);
+  qicScrollBottom();
+}
+
+function qicUser(text) {
+  const wrap = document.createElement('div');
+  wrap.className = 'qic-msg user';
+  const bubble = document.createElement('div');
+  bubble.className = 'qic-bubble';
+  bubble.textContent = text;
+  wrap.appendChild(bubble);
+  document.getElementById('qic-messages').appendChild(wrap);
+  qicScrollBottom();
+}
+
+function qicTyping() {
+  const wrap = document.createElement('div');
+  wrap.className = 'qic-msg bot';
+  wrap.id = 'qic-typing-indicator';
+  const t = document.createElement('div');
+  t.className = 'qic-typing';
+  t.innerHTML = '<div class="qic-dot"></div><div class="qic-dot"></div><div class="qic-dot"></div>';
+  wrap.appendChild(t);
+  document.getElementById('qic-messages').appendChild(wrap);
+  qicScrollBottom();
+}
+
+function qicRemoveTyping() {
+  document.getElementById('qic-typing-indicator')?.remove();
+}
+
+function qicOpts(options, callback) {
+  const wrap = document.createElement('div');
+  wrap.className = 'qic-msg bot';
+  const optsDiv = document.createElement('div');
+  optsDiv.className = 'qic-opts';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'qic-opt';
+    btn.textContent = opt;
+    btn.onclick = () => {
+      // Show as user message
+      qicUser(opt);
+      // Remove opts
+      wrap.remove();
+      qicDisableInput();
+      callback(opt);
+    };
+    optsDiv.appendChild(btn);
+  });
+  wrap.appendChild(optsDiv);
+  document.getElementById('qic-messages').appendChild(wrap);
+  qicScrollBottom();
+}
+
+function qicBotWithClients(msg, clients) {
+  qicBot(msg);
+  const wrap = document.createElement('div');
+  wrap.className = 'qic-msg bot';
+  const list = document.createElement('div');
+  list.className = 'qic-matches';
+  clients.forEach(c => {
+    const item = document.createElement('div');
+    item.className = 'qic-match-item';
+    item.innerHTML = `<div class="qic-match-name">${c.name}</div>${c.address ? `<div class="qic-match-addr">📍 ${c.address}</div>` : ''}`;
+    item.onclick = () => {
+      qicUser(c.name);
+      wrap.remove();
+      qicSelectClient(c.name, c.address);
+    };
+    list.appendChild(item);
+  });
+
+  // "None of these" option
+  const noneBtn = document.createElement('div');
+  noneBtn.className = 'qic-match-item';
+  noneBtn.innerHTML = `<div class="qic-match-name" style="color:var(--muted)">+ None of these — create new</div>`;
+  noneBtn.onclick = () => {
+    wrap.remove();
+    QIC.data.clientName  = QIC.data.clientName || clients[0]?.name;
+    QIC.data.isNewClient = true;
+    QIC.step = 2;
+    qicUser('New client');
+    qicBot(`What is their address?`);
+    qicShowInput('text', 'e.g. 10 Anson Road, Singapore 079903');
+  };
+  list.appendChild(noneBtn);
+
+  wrap.appendChild(list);
+  document.getElementById('qic-messages').appendChild(wrap);
+  qicScrollBottom();
+}
+
+function qicBotWithDate(defaultDate) {
+  const wrap = document.createElement('div');
+  wrap.className = 'qic-msg bot';
+  const dateWrap = document.createElement('div');
+  dateWrap.className = 'qic-date-wrap';
+
+  const input = document.createElement('input');
+  input.type  = 'date';
+  input.className = 'qic-date-input';
+  input.value = defaultDate;
+
+  const confirmBtn = document.createElement('button');
+  confirmBtn.className = 'qic-opt';
+  confirmBtn.textContent = '✅ Confirm Date';
+  confirmBtn.onclick = () => {
+    const val = input.value;
+    if (!val) { qicBot('⚠️ Please pick a date first.'); return; }
+    qicUser(new Date(val).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}));
+    wrap.remove();
+    qicHandleDate(val);
+  };
+
+  dateWrap.appendChild(input);
+  dateWrap.appendChild(confirmBtn);
+  wrap.appendChild(dateWrap);
+  document.getElementById('qic-messages').appendChild(wrap);
+  qicScrollBottom();
+}
+
+function qicBotWithDeliveryDate(defaultDate) {
+  const wrap = document.createElement('div');
+  wrap.className = 'qic-msg bot';
+  const dateWrap = document.createElement('div');
+  dateWrap.className = 'qic-date-wrap';
+
+  // "Same as billing date" shortcut button
+  const sameBtn = document.createElement('button');
+  sameBtn.className = 'qic-opt';
+  sameBtn.style.marginBottom = '6px';
+  sameBtn.textContent = '📋 Same as billing date';
+  sameBtn.onclick = () => {
+    const billingDisplay = QIC.data.billingDateDisplay;
+    qicUser('Same as billing date — ' + billingDisplay);
+    wrap.remove();
+    // Use billing date as delivery date
+    QIC.data.deliveryDate        = QIC.data.billingDate;
+    QIC.data.deliveryDateDisplay = billingDisplay;
+    QIC.step = 5;
+    qicBot('How many? <em style="font-size:.75rem;color:var(--muted)">(Qty)</em>');
+    qicShowInput('number', 'e.g. 1');
+  };
+
+  const input = document.createElement('input');
+  input.type = 'date';
+  input.className = 'qic-date-input';
+  input.value = defaultDate;
+
+  const confirmBtn = document.createElement('button');
+  confirmBtn.className = 'qic-opt';
+  confirmBtn.textContent = '✅ Confirm Delivery Date';
+  confirmBtn.onclick = () => {
+    const val = input.value;
+    if (!val) { qicBot('⚠️ Please pick a date first.'); return; }
+    qicUser(new Date(val).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }));
+    wrap.remove();
+    qicHandleDeliveryDate(val);
+  };
+
+  dateWrap.appendChild(sameBtn);
+  dateWrap.appendChild(input);
+  dateWrap.appendChild(confirmBtn);
+  wrap.appendChild(dateWrap);
+  document.getElementById('qic-messages').appendChild(wrap);
+  qicScrollBottom();
+}
+
+function qicBotSummary(rows, total) {
+  const wrap = document.createElement('div');
+  wrap.className = 'qic-msg bot';
+  const card = document.createElement('div');
+  card.className = 'qic-summary';
+
+  Object.entries(rows).forEach(([lbl, val]) => {
+    const row = document.createElement('div');
+    row.className = 'qic-summary-row';
+    row.innerHTML = `<span class="lbl">${lbl}</span><span><strong>${val}</strong></span>`;
+    card.appendChild(row);
+  });
+
+  const totalRow = document.createElement('div');
+  totalRow.className = 'qic-summary-total';
+  totalRow.innerHTML = `<span>Total</span><span>${total}</span>`;
+  card.appendChild(totalRow);
+
+  wrap.appendChild(card);
+  document.getElementById('qic-messages').appendChild(wrap);
+  qicScrollBottom();
+}
+
+function qicShowInput(type, placeholder) {
+  const area  = document.getElementById('qic-input-area');
+  const input = document.getElementById('qic-input');
+  area.style.display = 'flex';
+  input.type          = type || 'text';
+  input.placeholder   = placeholder || 'Type here…';
+  input.value         = '';
+  input.disabled      = false;
+  document.getElementById('qic-send-btn').disabled = false;
+  setTimeout(() => input.focus(), 100);
+}
+
+function qicHideInput() {
+  document.getElementById('qic-input-area').style.display = 'none';
+}
+
+function qicDisableInput() {
+  document.getElementById('qic-input').disabled = true;
+  document.getElementById('qic-send-btn').disabled = true;
+}
+
+function qicEnableInput() {
+  document.getElementById('qic-input').disabled = false;
+  document.getElementById('qic-send-btn').disabled = false;
+  document.getElementById('qic-input').focus();
+}
+
+function qicScrollBottom() {
+  const msgs = document.getElementById('qic-messages');
+  setTimeout(() => msgs.scrollTop = msgs.scrollHeight, 60);
+}
 
 </script>
+<button id="qic-fab" onclick="qicToggle()" title="Quick Invoice">
+  🧾
+  <span class="qic-badge" id="qic-badge">1</span>
+</button>
+
+<!-- Chat Panel -->
+<div id="qic-panel">
+  <!-- Header -->
+  <div class="qic-head">
+    <div class="qic-head-ico">🧾</div>
+    <div class="qic-head-info">
+      <div class="qic-head-title">Quick Invoice</div>
+      <div class="qic-head-sub">Create invoice in seconds</div>
+    </div>
+    <button class="qic-head-close" onclick="qicToggle()">✕</button>
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="qic-disclaimer">
+    ⚠️ <span>Quick mode supports <strong>one line item</strong> only. For multiple items use Add Invoice.</span>
+  </div>
+
+  <!-- Messages -->
+  <div class="qic-messages" id="qic-messages"></div>
+
+  <!-- Input Area -->
+  <div class="qic-input-area" id="qic-input-area">
+    <input
+      type="text"
+      id="qic-input"
+      placeholder="Type here…"
+      onkeydown="if(event.key==='Enter')qicSend()"
+      autocomplete="off"
+    />
+    <button class="qic-send" id="qic-send-btn" onclick="qicSend()">➤</button>
+  </div>
+
+  <!-- Restart -->
+  <div class="qic-restart">
+    <a onclick="qicRestart()">🔄 Start fresh</a>
+  </div>
+</div>
 </body>
 </html>
