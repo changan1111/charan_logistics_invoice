@@ -3790,6 +3790,30 @@ function qicBotActions(invNum) {
     else { alert('Invoice loading, please wait a moment.'); }
   };
 
+  // Share Invoice button
+  const shareBtn = document.createElement('button');
+  shareBtn.className = 'qic-result-btn secondary';
+  shareBtn.textContent = '📤 Share';
+  shareBtn.onclick = async () => {
+    shareBtn.textContent = '⏳ Preparing…';
+    shareBtn.disabled = true;
+    const tryShare = async (retries = 3) => {
+      const inv = ALL.find(i => i.number === invNum);
+      if (inv) {
+        curInv = inv;
+        await shareInv();
+        shareBtn.textContent = '📤 Share';
+        shareBtn.disabled = false;
+      } else if (retries > 0) {
+        setTimeout(() => tryShare(retries - 1), 800);
+      } else {
+        shareBtn.textContent = '⚠️ Not found — reload';
+        shareBtn.disabled = false;
+      }
+    };
+    tryShare();
+  };
+
   // New Invoice button
   const newBtn = document.createElement('button');
   newBtn.className = 'qic-result-btn secondary';
@@ -3797,6 +3821,7 @@ function qicBotActions(invNum) {
   newBtn.onclick = () => qicRestart();
 
   actDiv.appendChild(pdfBtn);
+  actDiv.appendChild(shareBtn);
   actDiv.appendChild(viewBtn);
   actDiv.appendChild(newBtn);
   wrap.appendChild(actDiv);
