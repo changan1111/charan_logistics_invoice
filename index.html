@@ -2840,7 +2840,7 @@ async function qtGenPDF() {
   y += 5;
 
   const tHead = [['DESCRIPTION & SCOPE','RATE TYPE','QTY','UNIT PRICE (S$)','TOTAL (S$)']];
-  const tBody = rows.map(r => [r.desc, r.rateType, '1', 'S$ '+r.price.toFixed(2), 'Nil', 'S$ '+r.total.toFixed(2)]);
+  const tBody = rows.map(r => [r.desc, r.rateType, '1', 'S$ '+r.price.toFixed(2), 'S$ '+r.total.toFixed(2)]);
 
   doc.autoTable({
     startY: y, margin: {left:M, right:M, top:CONTENT_TOP, bottom:FOOTER_H+8},
