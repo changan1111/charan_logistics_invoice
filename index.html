@@ -1158,41 +1158,77 @@ tbody tr:hover td{background:var(--ice);cursor:pointer;}
 <!-- ══════════ QUOTATION PANEL ══════════ -->
 <div id="panel-quotation" class="panel">
   <div class="page">
-    <div class="pr-info-note">💡 Fill quotation details and line items — export as PDF.</div>
+    <div class="pr-info-note">💡 Fill client details and line items — Charan Logistics details are pre-filled. Export as PDF.</div>
+
+    <!-- Quotation Meta -->
     <div class="pr-card">
       <div class="pr-card-title">Quotation Info</div>
       <div class="pr-form-grid">
-        <div class="pr-field"><label>Quotation No.</label><input type="text" id="q_num" placeholder="e.g. QT-2025-001"/></div>
-        <div class="pr-field"><label>Date</label><input type="date" id="q_date"/></div>
-        <div class="pr-field span2"><label>Client Name / Company</label><input type="text" id="q_client" placeholder="e.g. Mr. Dean / ABC Pte Ltd"/></div>
-        <div class="pr-field span2"><label>Client Address</label><textarea id="q_addr" rows="2" placeholder="Full address…"></textarea></div>
-        <div class="pr-field span2"><label>Notes / Working Hours / Terms</label><textarea id="q_notes" rows="2" placeholder="e.g. Working hours: Mon–Fri 8am–6pm"></textarea></div>
+        <div class="pr-field"><label>Quotation No. <span style="color:#c0282e">*</span></label><input type="text" id="q_num" placeholder="e.g. QT202645"/></div>
+        <div class="pr-field"><label>Date <span style="color:#c0282e">*</span></label><input type="date" id="q_date"/></div>
       </div>
     </div>
+
+    <!-- Charan Logistics (read-only) -->
+    <div class="pr-card" style="background:#f0f7ff;border:1px solid #bcd6f0;">
+      <div class="pr-card-title" style="color:#1e4b73;">From — Charan Logistics Pte Ltd <span style="font-size:11px;font-weight:400;color:#888">(pre-filled)</span></div>
+      <div style="font-size:12px;color:#555;line-height:1.8;padding-top:4px;">
+        <b>Reg No.</b> 202502540D &nbsp;|&nbsp;
+        <b>Address:</b> 101 Kitchener Road, #03-14 Jalan Besar Plaza, Singapore 208511<br/>
+        <b>Phone:</b> +65 91858511 &nbsp;|&nbsp;
+        <b>Email:</b> venkat@charanlogistics.com &nbsp;|&nbsp;
+        <b>GST:</b> Not GST Registered
+      </div>
+    </div>
+
+    <!-- Client / Bill To -->
     <div class="pr-card">
-      <div class="pr-card-title">Line Items</div>
-      <table class="qt-items-table">
-        <thead><tr>
-          <th style="width:40px">No.</th><th>Description</th>
-          <th style="width:130px;text-align:right">Unit Price (S$)</th>
-          <th style="width:70px;text-align:right">Qty</th>
-          <th style="width:130px;text-align:right">Total (S$)</th>
-          <th style="width:36px"></th>
-        </tr></thead>
-        <tbody id="qt_body"></tbody>
-      </table>
+      <div class="pr-card-title">Bill To — Client Details</div>
+      <div class="pr-form-grid">
+        <div class="pr-field"><label>Client Name <span style="color:#c0282e">*</span></label><input type="text" id="q_client" placeholder="e.g. Mr. IRWAN"/></div>
+        <div class="pr-field"><label>Title / Designation</label><input type="text" id="q_title" placeholder="e.g. Senior Operation Manager"/></div>
+        <div class="pr-field span2"><label>Company Name</label><input type="text" id="q_company" placeholder="e.g. PT Logistics Solutions Sdn Bhd"/></div>
+        <div class="pr-field span2"><label>Address <span style="color:#c0282e">*</span></label><textarea id="q_addr" rows="2" placeholder="e.g. 30 Jalan Remaja, Bamboo Grove Park, Singapore 637051"></textarea></div>
+        <div class="pr-field"><label>Phone</label><input type="text" id="q_phone" placeholder="+65 8XXX XXXX"/></div>
+        <div class="pr-field"><label>Email</label><input type="email" id="q_email" placeholder="client@company.com"/></div>
+      </div>
+    </div>
+
+    <!-- Line Items -->
+    <div class="pr-card">
+      <div class="pr-card-title">Scope of Services &amp; Pricing</div>
+      <div class="qt-items-table-wrap" style="overflow-x:auto;">
+        <table class="qt-items-table" style="min-width:560px;">
+          <thead><tr>
+            <th style="width:40px">No.</th>
+            <th>Description</th>
+            <th style="width:90px">Rate Type</th>
+            <th style="width:50px;text-align:center">Qty</th>
+            <th style="width:120px;text-align:right">Unit Price (S$)</th>
+            <th style="width:120px;text-align:right">Total (S$)</th>
+            <th style="width:36px"></th>
+          </tr></thead>
+          <tbody id="qt_body"></tbody>
+        </table>
+      </div>
       <button class="qt-add-row-btn" onclick="qtAddItem()">+ Add Item</button>
       <div class="qt-totals-row">
         <div class="qt-total-item"><div class="qt-total-label">Subtotal</div><div class="qt-total-value" id="qt_sub">S$ 0.00</div></div>
-        <div class="qt-total-item">
-          <div class="qt-total-label">GST 9% <input type="checkbox" id="qt_gst" onchange="qtCalc()" style="width:auto;margin-left:4px;transform:scale(1.2);vertical-align:middle"/></div>
-          <div class="qt-total-value" id="qt_gst_val">S$ 0.00</div>
-        </div>
+        <div class="qt-total-item"><div class="qt-total-label">GST</div><div class="qt-total-value" style="color:#888;font-size:1rem;">Not Registered (0%)</div></div>
         <div class="qt-total-item"><div class="qt-total-label">Grand Total</div><div class="qt-total-value grand" id="qt_grand">S$ 0.00</div></div>
       </div>
     </div>
+
+    <!-- Notes -->
+    <div class="pr-card">
+      <div class="pr-card-title">Notes / Working Hours</div>
+      <div class="pr-field">
+        <textarea id="q_notes" rows="3" style="width:100%" placeholder="e.g. Working Hours: Mon–Sat, 8 AM–6 PM. Overtime or Sunday deployment subject to additional charges."></textarea>
+      </div>
+    </div>
+
     <div class="pr-actions">
-      <button class="btn btn-dark" onclick="qtGenPDF()">⬇ Download PDF</button>
+      <button class="btn btn-dark" onclick="qtGenPDF()">⬇ Download Quotation PDF</button>
     </div>
   </div>
 </div>
@@ -1639,15 +1675,11 @@ function initApp(user) {
   ge('ps_paydate').value = today;
   ge('ps_month').value = today.slice(0,7);
 
-  // Add default quotation items
+  // Add default quotation items (Charan Logistics rate card)
   const DEF_ITEMS = [
-    ['Van with driver',5750,1],
-    ['Van with driver with Assistant',7750,1],
-    ['14ft box lorry w/o Tailgate with assistant',9750,1],
-    ['14ft box lorry with tailgate with assistant',10250,1],
-    ['24ft box lorry with assistant',11750,1],
-    ['24ft box lorry with tailgate with assistant',12750,1],
-    ['EV Van with driver',5000,1],
+    ['Van with Driver – Monthly Contract\nDedicated van + driver, Mon–Sat, 8 AM–6 PM\nFuel, ERP & parking charges inclusive', '/Month', 7250],
+    ['Van with Driver – Daily Rate\nOn-demand deployment, minimum 1 day\nFuel, ERP & parking charges inclusive', '/Day', 280],
+    ['Adhoc Drop Service\nMinimum 10 locations per drop\nIsland-wide delivery within Singapore', '/Drop', 15],
   ];
   DEF_ITEMS.forEach(d => qtAddItem(d[0], d[1], d[2]));
 
@@ -2590,15 +2622,18 @@ doc.text('Authorised Signatory & Seal', 190, y+14, { align: 'right' });
 //  QUOTATION
 // ══════════════════════════════════════════════════════════════
 let qtRowId = 0;
-function qtAddItem(desc='', price='', qty=1) {
+// desc = description text, rateType = '/Month' etc, price = unit price, qty always 1
+function qtAddItem(desc='', rateType='/Trip', price=0) {
   qtRowId++;
   const n=qtRowId, idx=ge('qt_body').children.length+1;
   const tr=document.createElement('tr'); tr.id='qtr'+n;
+  const safeDesc = desc.replace(/"/g,'&quot;').replace(/\n/g,'&#10;');
   tr.innerHTML=`
     <td style="text-align:center;color:#7a6e58;font-weight:600">${idx}</td>
-    <td><input type="text" placeholder="Description" value="${desc}" oninput="qtCalc()"/></td>
-    <td><input type="number" placeholder="0.00" value="${price}" min="0" step="0.01" oninput="qtCalc()" style="text-align:right"/></td>
-    <td><input type="number" value="${qty}" min="1" step="1" oninput="qtCalc()" style="text-align:right"/></td>
+    <td><textarea rows="2" style="width:100%;resize:vertical;font-size:.82rem;padding:4px 6px;border:1.5px solid var(--pborder);border-radius:6px;font-family:'Outfit',sans-serif;" oninput="qtCalc()">${desc}</textarea></td>
+    <td><input type="text" value="${rateType}" placeholder="/Month" oninput="qtCalc()" style="width:100%;"/></td>
+    <td style="text-align:center;color:#555;font-weight:600;font-size:.9rem;">1</td>
+    <td><input type="number" placeholder="0.00" value="${price}" min="0" step="0.01" oninput="qtCalc()" style="text-align:right;width:100%;"/></td>
     <td style="text-align:right;font-weight:600" id="qtrt${n}">S$ 0.00</td>
     <td><button class="qt-del-btn" onclick="qtDelItem(${n})">✕</button></td>`;
   ge('qt_body').appendChild(tr); qtCalc();
@@ -2611,16 +2646,13 @@ function qtDelItem(n) {
 function qtCalc() {
   let sub=0;
   [...ge('qt_body').querySelectorAll('tr')].forEach(r=>{
-    const p=parseFloat(r.cells[2].querySelector('input').value)||0;
-    const q=parseFloat(r.cells[3].querySelector('input').value)||0;
-    const t=p*q; sub+=t;
+    const p=parseFloat(r.cells[4].querySelector('input').value)||0; // price at col 4
+    const t=p; sub+=t; // qty always 1
     const el=ge('qtrt'+r.id.replace('qtr',''));
     if(el) el.textContent='S$ '+t.toFixed(2);
   });
-  const gst=ge('qt_gst').checked?sub*.09:0;
   ge('qt_sub').textContent=qtMf(sub);
-  ge('qt_gst_val').textContent=qtMf(gst);
-  ge('qt_grand').textContent=qtMf(sub+gst);
+  ge('qt_grand').textContent=qtMf(sub);
 }
 
 const imgCache={};
@@ -2644,68 +2676,303 @@ function loadImg(src){
 }
 
 async function qtGenPDF() {
-  const qno=ge('q_num').value||'QT-001', qdate=ge('q_date').value||today_str();
-  const client=ge('q_client').value||'—', addr=ge('q_addr').value||'', notes=ge('q_notes').value||'';
-  const useGst=ge('qt_gst').checked;
-  const rows=[];
-  [...ge('qt_body').querySelectorAll('tr')].forEach((r,i)=>{
-    const desc=r.cells[1].querySelector('input').value;
-    const price=parseFloat(r.cells[2].querySelector('input').value)||0;
-    const qty=parseFloat(r.cells[3].querySelector('input').value)||1;
-    if(desc||price) rows.push({n:i+1,desc,price,qty,total:price*qty});
+  const qno    = ge('q_num').value.trim();
+  const qdate  = ge('q_date').value;
+  const client = ge('q_client').value.trim();
+  const title  = ge('q_title').value.trim();
+  const company= ge('q_company').value.trim();
+  const addr   = ge('q_addr').value.trim();
+  const phone  = ge('q_phone').value.trim();
+  const email  = ge('q_email').value.trim();
+  const notes  = ge('q_notes').value.trim();
+
+  if (!qno)    { alert('Quotation Number is required.'); return; }
+  if (!qdate)  { alert('Date is required.'); return; }
+  if (!client) { alert('Client Name is required.'); return; }
+  if (!addr)   { alert('Client Address is required.'); return; }
+
+  // Collect line items (qty always 1)
+  const rows = [];
+  [...ge('qt_body').querySelectorAll('tr')].forEach((r, i) => {
+    const desc     = r.cells[1].querySelector('textarea').value.trim();
+    const rateType = r.cells[2].querySelector('input').value.trim() || '/Trip';
+    const price    = parseFloat(r.cells[4].querySelector('input').value) || 0;
+    if (desc) rows.push({ n: i+1, desc, rateType, price, qty: 1, total: price });
   });
-  const sub=rows.reduce((a,r)=>a+r.total,0),gst=useGst?sub*.09:0,grand=sub+gst;
-  const {jsPDF}=window.jspdf;
-  const doc=new jsPDF({format:'a4',unit:'mm'});
-  doc.setFillColor(250,247,240);doc.rect(0,0,210,297,'F');
+  if (!rows.length) { alert('Add at least one line item.'); return; }
 
-  const hdrImg=await loadImg('./header.png');
-  if(hdrImg){doc.addImage(hdrImg.d,hdrImg.ext,0,0,210,35,'','NONE');}
-  else{doc.setFillColor(26,26,46);doc.rect(0,0,210,36,'F');doc.setFillColor(201,168,76);doc.rect(0,36,210,2,'F');doc.setFont('helvetica','bold');doc.setFontSize(15);doc.setTextColor(255,255,255);doc.text('CHARAN LOGISTICS PTE LTD',105,13,{align:'center'});doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(200,190,160);doc.text('101 Kitchener Road #03-14, Singapore 208511  |  Reg No: 202502540D',105,20,{align:'center'});}
+  const sub   = rows.reduce((a, r) => a + r.total, 0);
+  const grand = sub; // no GST
 
-  const ftrImg=await loadImg('./footer.png');
-  if(ftrImg){doc.addImage(ftrImg.d,ftrImg.ext,0,297-22,210,22,'','NONE');}
-  else{doc.setFillColor(19,48,94);doc.rect(0,297-22,210,22,'F');doc.setFont('helvetica','italic');doc.setFontSize(8);doc.setTextColor(180,200,240);doc.text('CHARAN LOGISTICS PTE LTD  ·  101 Kitchener Road #03-14  ·  Singapore 208511',105,297-11,{align:'center'});}
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ format: 'a4', unit: 'mm' });
+  const W = 210, M = 8, HEADER_H = 35, FOOTER_H = 22;
+  const CONTENT_TOP = HEADER_H + 4;
 
-  doc.setFillColor(201,168,76);doc.roundedRect(73,39,64,10,2,2,'F');
-  doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(26,26,46);
-  doc.text('QUOTATION',105,46,{align:'center'});
+  // ── Images ──────────────────────────────────────────────────────────────
+  const [hdrImg, ftrImg] = await Promise.all([loadImg('./header.png'), loadImg('./footer.png')]);
 
-  let y=55;
-  doc.setFillColor(255,255,255);doc.setDrawColor(212,201,168);doc.setLineWidth(.4);
-  doc.roundedRect(14,y,182,26,3,3,'FD');
-  doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(120,110,88);
-  doc.text('QUOTATION NO.',20,y+8);doc.text('DATE',20,y+18);doc.text('CLIENT',108,y+8);doc.text('ADDRESS',108,y+18);
-  doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(26,26,46);
-  doc.text(qno,66,y+8);doc.text(qdate,66,y+18);doc.text(client,138,y+8);doc.text((doc.splitTextToSize(addr,58)[0]||''),138,y+18);
-
-  y+=32;doc.setFillColor(26,26,46);doc.rect(14,y,182,9,'F');
-  doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(201,168,76);
-  doc.text('NO.',18,y+6);doc.text('DESCRIPTION',30,y+6);doc.text('UNIT PRICE',132,y+6,{align:'right'});doc.text('QTY',150,y+6,{align:'right'});doc.text('TOTAL (S$)',196,y+6,{align:'right'});
-  y+=9;doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(26,26,46);
-  rows.forEach((r,i)=>{
-    const bg=i%2===0?[255,255,255]:[245,240,232];doc.setFillColor(...bg);doc.rect(14,y,182,10,'F');
-    doc.setDrawColor(220,212,196);doc.line(14,y+10,196,y+10);
-    doc.text(String(r.n),20,y+7,{align:'center'});
-    doc.text(doc.splitTextToSize(r.desc,96)[0],30,y+7);
-    doc.text(r.price.toFixed(2),132,y+7,{align:'right'});
-    doc.text(String(r.qty),150,y+7,{align:'right'});
-    doc.text(r.total.toFixed(2),196,y+7,{align:'right'}); y+=10;
-  });
-
-  y+=5;
-  [{l:'Subtotal',v:sub,b:false},...(useGst?[{l:'GST (9%)',v:gst,b:false}]:[]),{l:'GRAND TOTAL',v:grand,b:true}].forEach(t=>{
-    if(t.b){doc.setFillColor(26,26,46);doc.rect(118,y,78,11,'F');doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(201,168,76);doc.text(t.l,124,y+7.5);doc.text(qtMf(t.v),196,y+7.5,{align:'right'});y+=11;}
-    else{doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(100,90,75);doc.text(t.l,124,y+6);doc.setTextColor(26,26,46);doc.text(qtMf(t.v),196,y+6,{align:'right'});y+=9;}
-  });
-
-  if(notes){
-    y+=6;const nl=doc.splitTextToSize(notes,172);
-    doc.setFillColor(255,255,255);doc.setDrawColor(212,201,168);
-    doc.roundedRect(14,y,182,8+nl.length*5.5,3,3,'FD');
-    doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(120,110,88);doc.text('NOTES & TERMS',18,y+6);
-    doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(50,50,50);doc.text(nl,18,y+12);
+  function drawHdrFtr() {
+    if (hdrImg) doc.addImage(hdrImg.d, hdrImg.ext, 0, 0, W, HEADER_H, '', 'NONE');
+    else {
+      doc.setFillColor(11,29,58); doc.rect(0,0,W,HEADER_H,'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(255,255,255);
+      doc.text('CHARAN LOGISTICS PTE LTD', 105, 20, {align:'center'});
+    }
+    if (ftrImg) doc.addImage(ftrImg.d, ftrImg.ext, 0, 297-FOOTER_H, W, FOOTER_H, '', 'NONE');
+    else {
+      doc.setFillColor(19,48,94); doc.rect(0,297-FOOTER_H,W,FOOTER_H,'F');
+      doc.setFont('helvetica','italic'); doc.setFontSize(8); doc.setTextColor(180,200,240);
+      doc.text('CHARAN LOGISTICS PTE LTD  ·  101 Kitchener Road  ·  Singapore 208511', 105, 297-11, {align:'center'});
+    }
   }
+  drawHdrFtr();
+
+  // ── QUOTATION title bar ─────────────────────────────────────────────────
+  let y = CONTENT_TOP + 2;
+  doc.setFillColor(11,29,58); doc.rect(M, y, W-M*2, 10, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(201,168,76);
+  doc.text('QUOTATION', 105, y+7, {align:'center'});
+  y += 14;
+
+  // ── Meta grid ──────────────────────────────────────────────────────────
+  const validUntil = (() => { const d=new Date(qdate); d.setDate(d.getDate()+30); return d.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}); })();
+  const fmtD = ds => new Date(ds).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  const metaL = [['Quotation No.', qno], ['Date', fmtD(qdate)], ['Valid Until', validUntil]];
+  const metaR = [['Currency','S$ (Singapore Dollar)'], ['Prepared By','Venkat Kumar | +65 91858511']];
+  doc.setFontSize(8.5);
+  metaL.forEach(([lbl,val],i) => {
+    const ry = y + i*5.5;
+    doc.setFont('helvetica','bold'); doc.setTextColor(70,95,130); doc.text(lbl+' :', M, ry);
+    doc.setFont('helvetica','normal'); doc.setTextColor(11,29,58); doc.text(val, M+34, ry);
+  });
+  metaR.forEach(([lbl,val],i) => {
+    const ry = y + i*5.5;
+    doc.setFont('helvetica','bold'); doc.setTextColor(70,95,130); doc.text(lbl+' :', 115, ry);
+    doc.setFont('helvetica','normal'); doc.setTextColor(11,29,58); doc.text(val, 141, ry);
+  });
+  y += metaL.length * 5.5 + 4;
+  doc.setDrawColor(210,225,245); doc.setLineWidth(0.4); doc.line(M, y, W-M, y);
+  y += 5;
+
+  // ── PARTIES ────────────────────────────────────────────────────────────
+  const colW = (W - M*2 - 6) / 2;
+  const colRX = M + colW + 6;
+
+  // Headers
+  doc.setFillColor(11,29,58);  doc.rect(M,    y, colW, 7, 'F');
+  doc.setFillColor(23,162,184); doc.rect(colRX,y, colW, 7, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(255,255,255);
+  doc.text('FROM – SERVICE PROVIDER', M+3,    y+4.8);
+  doc.text('BILL TO – CLIENT',         colRX+3, y+4.8);
+  y += 7;
+
+  // expandRows splits Address by \n or ,
+  function expandRows(rowsArr) {
+    const out = [];
+    rowsArr.forEach(([lbl, val, bold]) => {
+      if (lbl === 'Address') {
+        const lines = (val||'').split(/\n|,/).map(s=>s.trim()).filter(Boolean);
+        lines.forEach((line, i) => out.push([i===0?'Address':'', line, false]));
+      } else {
+        out.push([lbl, val, bold]);
+      }
+    });
+    return out;
+  }
+
+  const fromRows = expandRows([
+    ['', 'Charan Logistics Pte Ltd', true],
+    ['Reg No.', '202502540D'],
+    ['Address', '101 Kitchener Road\n#03-14 Jalan Besar Plaza\nSingapore 208511'],
+    ['Phone',   '+65 91858511'],
+    ['Email',   'venkat@charanlogistics.com'],
+    ['Web',     'www.charanlogistics.com'],
+    ['GST',     'Not GST Registered'],
+  ]);
+
+  const toRowsRaw = [
+    ['', client, true],
+    ...(title   ? [['Title',   title]]   : []),
+    ...(company ? [['Company', company]] : []),
+    ['Address', addr],
+    ...(phone   ? [['Phone', phone]]     : []),
+    ...(email   ? [['Email', email]]     : []),
+  ];
+  const toRows = expandRows(toRowsRaw);
+
+  const ROW_H = 6.5;
+  const LBL_X = 3, VAL_X = 22;
+  const maxR  = Math.max(fromRows.length, toRows.length);
+  const bodyH = maxR * ROW_H + 6;
+
+  doc.setFillColor(245,249,255);
+  doc.rect(M,    y, colW, bodyH, 'F');
+  doc.rect(colRX,y, colW, bodyH, 'F');
+
+  function drawPartyRows(rows, sx) {
+    rows.forEach(([lbl, val, bold], i) => {
+      const ry = y + 5 + i * ROW_H;
+      if (lbl) {
+        doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(100,120,160);
+        doc.text(lbl, sx+LBL_X, ry);
+        doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(11,29,58);
+        doc.text(val, sx+VAL_X, ry);
+      } else if (bold) {
+        doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(11,29,58);
+        doc.text(val, sx+LBL_X, ry);
+      } else {
+        // address continuation — indent to value column
+        doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(11,29,58);
+        doc.text(val, sx+VAL_X, ry);
+      }
+    });
+  }
+
+  drawPartyRows(fromRows, M);
+  drawPartyRows(toRows,   colRX);
+  doc.setDrawColor(210,225,245); doc.setLineWidth(0.2);
+  doc.rect(M,    y, colW, bodyH, 'S');
+  doc.rect(colRX,y, colW, bodyH, 'S');
+  y += bodyH + 6;
+
+  // ── SCOPE TABLE ────────────────────────────────────────────────────────
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(23,162,184);
+  doc.text('SCOPE OF SERVICES & PRICING', M, y);
+  doc.setDrawColor(210,225,245); doc.line(M, y+1.5, W-M, y+1.5);
+  y += 5;
+
+  const tHead = [['DESCRIPTION & SCOPE','RATE TYPE','QTY','UNIT PRICE (S$)','TAX / GST','TOTAL (S$)']];
+  const tBody = rows.map(r => [r.desc, r.rateType, '1', 'S$ '+r.price.toFixed(2), 'Nil', 'S$ '+r.total.toFixed(2)]);
+
+  doc.autoTable({
+    startY: y, margin: {left:M, right:M, top:CONTENT_TOP, bottom:FOOTER_H+8},
+    rowPageBreak: 'avoid',
+    head: tHead, body: tBody,
+    headStyles: {fillColor:[11,29,58], textColor:[175,205,240], fontSize:8, fontStyle:'bold', cellPadding:3},
+    bodyStyles: {fontSize:8.5, textColor:[25,45,80], cellPadding:3},
+    alternateRowStyles: {fillColor:[245,249,255]},
+    columnStyles: {
+      0:{cellWidth:'auto', halign:'left',   fontStyle:'bold'},
+      1:{cellWidth:22,     halign:'center'},
+      2:{cellWidth:12,     halign:'center'},
+      3:{cellWidth:28,     halign:'right'},
+      4:{cellWidth:18,     halign:'center'},
+      5:{cellWidth:28,     halign:'right',  fontStyle:'bold'},
+    },
+    styles:{lineColor:[220,232,248], lineWidth:0.25},
+    didDrawPage: () => { drawHdrFtr(); },
+  });
+
+  y = doc.lastAutoTable.finalY + 4;
+
+  // ── TOTALS ─────────────────────────────────────────────────────────────
+  const totW = 80, totX = W-M-totW;
+  const totRows2 = [
+    ['Subtotal',                  'S$ '+sub.toFixed(2),   false],
+    ['GST (0% – Not Registered)', '–',                     false],
+    ['GRAND TOTAL',               'S$ '+grand.toFixed(2), true ],
+  ];
+  let ty = y;
+  totRows2.forEach(([lbl,val,bold],i) => {
+    if (bold) {
+      doc.setFillColor(11,29,58); doc.rect(totX,ty,totW,7,'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(255,255,255);
+    } else {
+      doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(11,29,58);
+    }
+    doc.text(lbl, totX+4, ty+5);
+    doc.text(val, totX+totW-4, ty+5, {align:'right'});
+    if (i < totRows2.length-1) { doc.setDrawColor(210,225,245); doc.setLineWidth(0.2); doc.line(totX,ty+7,totX+totW,ty+7); }
+    ty += 7;
+  });
+  y = ty + 6;
+
+  // ── NOTES ──────────────────────────────────────────────────────────────
+  const SAFE_BOTTOM = 297 - FOOTER_H - 10;
+  const ensureSpace = (n) => { if(y+n>SAFE_BOTTOM){doc.addPage();drawHdrFtr();y=CONTENT_TOP+4;} };
+
+  if (notes) {
+    ensureSpace(16);
+    doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(23,162,184);
+    doc.text('NOTES / WORKING HOURS', M, y);
+    doc.setDrawColor(210,225,245); doc.line(M, y+1.5, W-M, y+1.5);
+    y += 5;
+    doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(60,60,60);
+    const nl = doc.splitTextToSize(notes, W-M*2);
+    doc.text(nl, M, y);
+    y += nl.length * 4.5 + 5;
+  }
+
+  // ── TERMS ──────────────────────────────────────────────────────────────
+  const TERMS = [
+    'This quotation is valid for 30 days from the date of issue.',
+    'Payment Terms: 50% advance upon acceptance of quotation; remaining 50% upon commencement of service.',
+    'Working Hours: Monday to Saturday, 8 AM – 6 PM. Overtime or Sunday deployment subject to additional charges.',
+    'All prices are in Singapore Dollars (S$). Charan Logistics Pte Ltd is not GST registered.',
+    'Fuel surcharge, ERP, and parking costs are included unless otherwise stated.',
+    'Additional stops beyond the agreed scope will be charged at prevailing rates.',
+    'Charan Logistics Pte Ltd reserves the right to substitute vehicles of equivalent capacity if required.',
+    'Cancellation policy: 48 hours\' notice required; cancellations within 24 hours may attract a cancellation fee.',
+    'This quotation supersedes all previous verbal or written communications on the same subject.',
+  ];
+
+  ensureSpace(12);
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(23,162,184);
+  doc.text('TERMS & CONDITIONS', M, y);
+  doc.setDrawColor(210,225,245); doc.line(M, y+1.5, W-M, y+1.5);
+  y += 5;
+
+  TERMS.forEach((term, i) => {
+    const wrapped = doc.splitTextToSize(term, W-M*2-10);
+    const rowH = wrapped.length*4+3;
+    ensureSpace(rowH);
+    if (i%2===0) { doc.setFillColor(245,249,255); doc.rect(M, y-2, W-M*2, rowH, 'F'); }
+    doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(23,162,184);
+    doc.text(String(i+1), M+2, y+2);
+    doc.setFont('helvetica','normal'); doc.setTextColor(40,40,40);
+    doc.text(wrapped, M+8, y+2);
+    y += rowH+1;
+  });
+  y += 4;
+
+  // ── ACCEPTANCE ─────────────────────────────────────────────────────────
+  ensureSpace(44);
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(23,162,184);
+  doc.text('ACCEPTANCE', M, y);
+  doc.setDrawColor(210,225,245); doc.line(M, y+1.5, W-M, y+1.5);
+  y += 5;
+
+  doc.setFont('helvetica','italic'); doc.setFontSize(7.5); doc.setTextColor(100,100,100);
+  const acceptTxt = 'By signing below, the client confirms acceptance of this quotation, agrees to the terms and conditions stated herein, and authorises Charan Logistics Pte Ltd to proceed with the agreed services.';
+  doc.text(doc.splitTextToSize(acceptTxt, W-M*2), M, y);
+  y += 10;
+
+  const sigW = (W-M*2-8)/2;
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(11,29,58);
+  doc.text('For Charan Logistics Pte Ltd', M, y);
+  doc.text('Client Authorisation', M+sigW+8, y);
+  y += 12;
+
+  doc.setDrawColor(60,60,60); doc.setLineWidth(0.3);
+  doc.line(M, y, M+sigW, y);
+  doc.line(M+sigW+8, y, M+sigW*2+8, y);
+  y += 4;
+
+  doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(120,120,120);
+  doc.text('Authorised Signatory | Date: ___________', M, y);
+  doc.text('Name: _______________ | Date: ___________', M+sigW+8, y);
+  y += 5;
+  doc.text('Stamp (if applicable):', M, y);
+  doc.text('Designation: ___________________________', M+sigW+8, y);
+
+  // Page numbers
+  const pc = doc.internal.getNumberOfPages();
+  for (let p=1; p<=pc; p++) {
+    doc.setPage(p); doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(130,150,180);
+    doc.text(`Page ${p} of ${pc}`, W/2, 290, {align:'center'});
+  }
+
   doc.save(`Quotation_${qno}_${(client||'').replace(/\s+/g,'_')}.pdf`);
 }
 
