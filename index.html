@@ -1177,7 +1177,6 @@ tbody tr:hover td{background:var(--ice);cursor:pointer;}
         <b>Address:</b> 101 Kitchener Road, #03-14 Jalan Besar Plaza, Singapore 208511<br/>
         <b>Phone:</b> +65 91858511 &nbsp;|&nbsp;
         <b>Email:</b> venkat@charanlogistics.com &nbsp;|&nbsp;
-        <b>GST:</b> Not GST Registered
       </div>
     </div>
 
@@ -2739,7 +2738,7 @@ async function qtGenPDF() {
   const validUntil = (() => { const d=new Date(qdate); d.setDate(d.getDate()+30); return d.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}); })();
   const fmtD = ds => new Date(ds).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
   const metaL = [['Quotation No.', qno], ['Date', fmtD(qdate)], ['Valid Until', validUntil]];
-  const metaR = [['Currency','S$ (Singapore Dollar)'], ['Prepared By','Venkat Kumar | +65 91858511']];
+  const metaR = [['Currency','S$ (Singapore Dollar)'], ['Prepared By','Venkat | +65 91858511']];
   doc.setFontSize(8.5);
   metaL.forEach(([lbl,val],i) => {
     const ry = y + i*5.5;
@@ -2788,7 +2787,6 @@ async function qtGenPDF() {
     ['Phone',   '+65 91858511'],
     ['Email',   'venkat@charanlogistics.com'],
     ['Web',     'www.charanlogistics.com'],
-    ['GST',     'Not GST Registered'],
   ]);
 
   const toRowsRaw = [
@@ -2842,7 +2840,7 @@ async function qtGenPDF() {
   doc.setDrawColor(210,225,245); doc.line(M, y+1.5, W-M, y+1.5);
   y += 5;
 
-  const tHead = [['DESCRIPTION & SCOPE','RATE TYPE','QTY','UNIT PRICE (S$)','TAX / GST','TOTAL (S$)']];
+  const tHead = [['DESCRIPTION & SCOPE','RATE TYPE','QTY','UNIT PRICE (S$)','TOTAL (S$)']];
   const tBody = rows.map(r => [r.desc, r.rateType, '1', 'S$ '+r.price.toFixed(2), 'Nil', 'S$ '+r.total.toFixed(2)]);
 
   doc.autoTable({
@@ -2870,7 +2868,6 @@ async function qtGenPDF() {
   const totW = 80, totX = W-M-totW;
   const totRows2 = [
     ['Subtotal',                  'S$ '+sub.toFixed(2),   false],
-    ['GST (0% – Not Registered)', '–',                     false],
     ['GRAND TOTAL',               'S$ '+grand.toFixed(2), true ],
   ];
   let ty = y;
