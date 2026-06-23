@@ -2642,15 +2642,21 @@ function qtDelItem(n) {
   qtCalc();
 }
 function qtCalc() {
-  let sub=0;
-  [...ge('qt_body').querySelectorAll('tr')].forEach(r=>{
-    const p=parseFloat(r.cells[4].querySelector('input').value)||0; // price at col 4
-    const t=p; sub+=t; // qty always 1
-    const el=ge('qtrt'+r.id.replace('qtr',''));
-    if(el) el.textContent='S$ '+t.toFixed(2);
+  let sub = 0;
+  [...ge('qt_body').querySelectorAll('tr')].forEach(r => {
+    // Find the price input in the row (robust to column changes)
+    const priceInput = r.querySelector('input[type="number"]');
+    const price = parseFloat(priceInput?.value) || 0;
+    // Qty is fixed at 1 for quotation rows in this layout
+    const qty = 1;
+    const t = price * qty;
+    sub += t;
+    const id = r.id.replace('qtr','');
+    const el = ge('qtrt'+id);
+    if (el) el.textContent = 'S$ ' + t.toFixed(2);
   });
-  ge('qt_sub').textContent=qtMf(sub);
-  ge('qt_grand').textContent=qtMf(sub);
+  ge('qt_sub').textContent = qtMf(sub);
+  ge('qt_grand').textContent = qtMf(sub);
 }
 
 const imgCache={};
