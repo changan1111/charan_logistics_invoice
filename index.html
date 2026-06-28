@@ -3073,7 +3073,7 @@ function aiAddRow(date='', desc='', qty='', rate='') {
     <td style="text-align:center;color:#7a6e58;font-weight:600;font-size:.82rem">${idx}</td>
     <td><input type="date" value="${date}" oninput="aiCalcTotal()" style="min-width:130px"/></td>
     <td><input type="text" placeholder="Description" value="${desc}" oninput="aiClearRowErr(${n});aiCalcTotal()"/></td>
-    <td><input type="number" placeholder="1" value="${qty}" min="0.01" step="0.01" oninput="aiClearRowErr(${n});aiCalcTotal()" style="text-align:center"/></td>
+    <td><input type="number" placeholder="1" value="${qty}" step="0.01" oninput="aiClearRowErr(${n});aiCalcTotal()" style="text-align:center"/></td>
     <td><input type="number" placeholder="0.00" value="${rate}" min="0" step="0.01" oninput="aiClearRowErr(${n});aiCalcTotal()" style="text-align:right"/></td>
     <td style="text-align:right;font-weight:600;font-size:.85rem;color:var(--ink)" id="aiamt${n}">S$ 0.00</td>
     <td><button class="qt-del-btn" onclick="aiDelRow(${n})" title="Remove row">✕</button></td>`;
@@ -3174,7 +3174,7 @@ async function aiSubmit() {
     let rowOk = true;
 
     if (!desc)               { r.cells[2].querySelector('input').classList.add('error'); liValid=false; rowOk=false; }
-    if (!qty || qty <= 0)    { r.cells[3].querySelector('input').classList.add('error'); liValid=false; rowOk=false; }
+    if (isNaN(qty) || qty === 0)    { r.cells[3].querySelector('input').classList.add('error'); liValid=false; rowOk=false; }
     if (isNaN(rate)||rate<0) { r.cells[4].querySelector('input').classList.add('error'); liValid=false; rowOk=false; }
 
     // Convert line-item date: YYYY-MM-DD → DD-MM-YYYY (null if blank)
@@ -3477,7 +3477,7 @@ function eiAddRow(date='', desc='', qty='', rate='') {
     <td style="text-align:center;color:#7a6e58;font-weight:600;font-size:.82rem">${idx}</td>
     <td><input type="date" value="${date}" oninput="eiCalcTotal()" style="min-width:130px"/></td>
     <td><input type="text" placeholder="Description" value="${desc}" oninput="eiClearRowErr(${n});eiCalcTotal()"/></td>
-    <td><input type="number" placeholder="1" value="${qty}" min="0.01" step="0.01" oninput="eiClearRowErr(${n});eiCalcTotal()" style="text-align:center"/></td>
+    <td><input type="number" placeholder="1" value="${qty}" step="0.01" oninput="eiClearRowErr(${n});eiCalcTotal()" style="text-align:center"/></td>
     <td><input type="number" placeholder="0.00" value="${rate}" min="0" step="0.01" oninput="eiClearRowErr(${n});eiCalcTotal()" style="text-align:right"/></td>
     <td style="text-align:right;font-weight:600;font-size:.85rem;color:var(--ink)" id="eiamt${n}">S$ 0.00</td>
     <td><button class="qt-del-btn" onclick="eiDelRow(${n})" title="Remove row">✕</button></td>`;
@@ -3562,7 +3562,7 @@ async function eiSubmit() {
     let rowOk = true;
 
     if (!desc)               { r.cells[2].querySelector('input').classList.add('error'); liValid=false; rowOk=false; }
-    if (!qty || qty <= 0)    { r.cells[3].querySelector('input').classList.add('error'); liValid=false; rowOk=false; }
+    if (isNaN(qty) || qty === 0)    { r.cells[3].querySelector('input').classList.add('error'); liValid=false; rowOk=false; }
     if (isNaN(rate)||rate<0) { r.cells[4].querySelector('input').classList.add('error'); liValid=false; rowOk=false; }
 
     // Convert line-item date: YYYY-MM-DD → DD-MM-YYYY (null if blank)
