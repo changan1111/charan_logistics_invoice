@@ -3175,7 +3175,7 @@ async function aiSubmit() {
 
     if (!desc)               { r.cells[2].querySelector('input').classList.add('error'); liValid=false; rowOk=false; }
     if (isNaN(qty) || qty === 0)    { r.cells[3].querySelector('input').classList.add('error'); liValid=false; rowOk=false; }
-    if (isNaN(rate)||rate<0) { r.cells[4].querySelector('input').classList.add('error'); liValid=false; rowOk=false; }
+    if (isNaN(rate)) { r.cells[4].querySelector('input').classList.add('error'); liValid=false; rowOk=false; }
 
     // Convert line-item date: YYYY-MM-DD → DD-MM-YYYY (null if blank)
     let dateVal = null;
@@ -3563,7 +3563,7 @@ async function eiSubmit() {
 
     if (!desc)               { r.cells[2].querySelector('input').classList.add('error'); liValid=false; rowOk=false; }
     if (isNaN(qty) || qty === 0)    { r.cells[3].querySelector('input').classList.add('error'); liValid=false; rowOk=false; }
-    if (isNaN(rate)||rate<0) { r.cells[4].querySelector('input').classList.add('error'); liValid=false; rowOk=false; }
+    if (isNaN(rate)) { r.cells[4].querySelector('input').classList.add('error'); liValid=false; rowOk=false; }
 
     // Convert line-item date: YYYY-MM-DD → DD-MM-YYYY (null if blank)
     let dateVal = null;
